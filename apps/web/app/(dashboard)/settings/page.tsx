@@ -501,6 +501,10 @@ export default function SettingsPage() {
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                     Statistiques avancées
                   </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    Export CSV
+                  </li>
                 </ul>
                 <button
                   onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!)}

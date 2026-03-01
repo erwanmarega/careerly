@@ -85,6 +85,36 @@ export class ApplicationsService {
     return application
   }
 
+  async exportCsv(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } })
+    if (user.plan === Plan.FREE) throw new ForbiddenException('CSV export requires a Pro plan')
+
+    const applications = await this.prisma.application.findMany({
+      where: { userId },
+      orderBy: { appliedAt: 'desc' },
+    })
+
+    const escape = (v: string | null | undefined) => {
+      if (v == null) return ''
+      const s = String(v)
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+    }
+
+    const header = ['Company', 'Position', 'Location', 'Status', 'Applied At', 'Salary', 'URL', 'Notes']
+    const rows = applications.map((a) => [
+      escape(a.company),
+      escape(a.position),
+      escape(a.location),
+      escape(a.status),
+      escape(a.appliedAt.toISOString().split('T')[0]),
+      escape(a.salary),
+      escape(a.url),
+      escape(a.notes),
+    ])
+
+    return [header.join(','), ...rows.map((r) => r.join(','))].join('\n')
+  }
+
   async delete(id: string, userId: string) {
     await this.findOne(id, userId)
     await this.prisma.application.delete({ where: { id } })

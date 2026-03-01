@@ -10,10 +10,12 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import type { Response } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApplicationStatus } from '@prisma/client'
 import type { User } from '@prisma/client'
@@ -54,6 +56,15 @@ export class ApplicationsController {
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateApplicationDto) {
     return this.applicationsService.create(user.id, dto)
+  }
+
+  @Get('export')
+  async exportCsv(@CurrentUser() user: User, @Res() res: Response) {
+    const csv = await this.applicationsService.exportCsv(user.id)
+    const date = new Date().toISOString().split('T')[0]
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', `attachment; filename="careerly-${date}.csv"`)
+    res.send('\uFEFF' + csv)
   }
 
   @Post('import')

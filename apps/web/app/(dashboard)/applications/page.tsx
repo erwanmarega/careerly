@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
+  ArrowRight,
   ArrowUpDown,
   Check,
   Download,
@@ -21,9 +22,9 @@ import {
   STATUS_STYLES,
   type Application,
 } from '@/lib/applications'
-import { exportApplicationsPdf } from '@/lib/export-pdf'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { api } from '@/lib/api'
+import { useUser } from '@/hooks/useUser'
 
 const SORT_OPTIONS = [
   { value: 'appliedAt:desc', label: 'Date (récent)' },
@@ -110,6 +111,8 @@ const LIMIT = 20
 export default function ApplicationsPage() {
   const searchParams = useSearchParams()
   const initialStatus = searchParams.get('status') ?? ''
+  const { user } = useUser()
+  const isFree = user?.plan === 'FREE'
 
   const [applications, setApplications] = useState<Application[]>([])
   const [total, setTotal] = useState(0)
@@ -118,7 +121,8 @@ export default function ApplicationsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState(initialStatus)
   const [sort, setSort] = useState('appliedAt:desc')
-  const [exporting, setExporting] = useState(false)
+  const [exportingCsv, setExportingCsv] = useState(false)
+  const [showCsvUpgradeModal, setShowCsvUpgradeModal] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
@@ -191,24 +195,30 @@ export default function ApplicationsPage() {
     load(search, statusFilter, newPage, sort)
   }
 
-  async function handleExport() {
-    setExporting(true)
+  async function handleExportCsv() {
+    if (isFree) {
+      setShowCsvUpgradeModal(true)
+      return
+    }
+    setExportingCsv(true)
     try {
-      const [sortBy, sortOrder] = sort.split(':') as [
-        'appliedAt' | 'company' | 'status',
-        'asc' | 'desc',
-      ]
-      const res = await fetchApplications({
-        search: search || undefined,
-        status: statusFilter || undefined,
-        sortBy,
-        sortOrder,
-        limit: 10000,
+      const match = document.cookie.match(/(?:^|; )access_token=([^;]*)/)
+      const token = match ? decodeURIComponent(match[1]) : null
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+      const res = await fetch(`${apiUrl}/applications/export`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
-      await exportApplicationsPdf(res.data)
+      if (!res.ok) throw new Error('Export failed')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `careerly-${new Date().toISOString().split('T')[0]}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
     } catch {
     } finally {
-      setExporting(false)
+      setExportingCsv(false)
     }
   }
 
@@ -372,12 +382,13 @@ export default function ApplicationsPage() {
           </button>
 
           <button
-            onClick={handleExport}
-            disabled={exporting || (viewMode === 'list' ? total === 0 : kanbanApps.length === 0)}
+            onClick={handleExportCsv}
+            disabled={exportingCsv}
             className="inline-flex items-center gap-2 border border-border bg-white text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            title={isFree ? 'Export CSV — Plan Pro requis' : 'Exporter en CSV'}
           >
             <Download className="w-4 h-4" />
-            {exporting ? 'Export…' : 'PDF'}
+            <span className="hidden sm:inline">{exportingCsv ? 'Export…' : 'CSV'}</span>
           </button>
           <Link
             href="/applications/new"
@@ -560,6 +571,51 @@ export default function ApplicationsPage() {
         </div>
       )}
 
+      {showCsvUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl border border-border shadow-xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold text-base">Fonctionnalité Pro</h2>
+              <button
+                onClick={() => setShowCsvUpgradeModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="bg-violet-50 border border-violet-100 rounded-xl p-4 mb-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+                  <Download className="w-4 h-4 text-violet-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-violet-900">Export CSV</p>
+                  <p className="text-xs text-violet-600">Plan Pro requis</p>
+                </div>
+              </div>
+              <p className="text-xs text-violet-700">
+                Exportez toutes vos candidatures au format CSV pour les analyser dans Excel, Google
+                Sheets ou tout autre outil.
+              </p>
+            </div>
+            <Link
+              href="/settings"
+              onClick={() => setShowCsvUpgradeModal(false)}
+              className="flex items-center justify-center gap-2 w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+            >
+              Passer au Pro
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <button
+              onClick={() => setShowCsvUpgradeModal(false)}
+              className="mt-2 w-full text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
+            >
+              Pas maintenant
+            </button>
+          </div>
+        </div>
+      )}
+
       {importOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl border border-border shadow-xl w-full max-w-md p-6">
@@ -700,7 +756,7 @@ export default function ApplicationsPage() {
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                   {FIELD_CONFIG.map(({ key, label, required }) => (
                     <div key={key} className="flex items-center gap-3">
-                      <label className="text-xs font-medium w-40 flex-shrink-0 text-foreground">
+                        <label className="text-xs font-medium w-40 flex-shrink-0 text-foreground">
                         {label}
                         {required && <span className="text-red-500 ml-0.5">*</span>}
                       </label>

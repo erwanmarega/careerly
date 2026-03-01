@@ -28,6 +28,7 @@ export class RemindersProcessor {
       name: reminder.user.name ?? reminder.user.email,
       company: reminder.application.company,
       position: reminder.application.position,
+      applicationId: reminder.applicationId,
       message: reminder.message,
     })
 

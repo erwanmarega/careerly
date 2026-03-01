@@ -35,7 +35,7 @@ export class AuthService {
     if (!user || !user.password) throw new UnauthorizedException('Invalid credentials')
 
     const valid = await bcrypt.compare(dto.password, user.password)
-    if (!valid) throw new UnauthorizedException('Invalid credentials')
+    if (!valid) throw new UnauthorizedException('Email ou mot de passe incorrects')
 
     const tokens = await this.generateTokens(user)
     await this.updateRefreshToken(user.id, tokens.refreshToken)
