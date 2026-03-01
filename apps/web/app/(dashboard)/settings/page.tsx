@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Camera, CheckCircle2, Crown, Loader2, Sparkles, X, Zap } from 'lucide-react'
+import { Camera, CheckCircle2, Crown, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
 import { useUser } from '@/hooks/useUser'
 import { clearTokens, storeUser, type AuthUser } from '@/lib/auth'
 
 const inputCls =
-  'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all'
+  'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card'
 
 const PLAN_LABELS: Record<string, string> = {
   FREE: 'Gratuit',
@@ -153,6 +154,7 @@ export default function SettingsPage() {
   const { user, loading } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { theme, setTheme } = useTheme()
 
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
@@ -298,7 +300,7 @@ export default function SettingsPage() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="bg-white rounded-2xl border border-border p-6 space-y-4 animate-pulse"
+            className="bg-card rounded-2xl border border-border p-6 space-y-4 animate-pulse"
           >
             <div className="h-4 bg-secondary rounded w-32" />
             <div className="h-10 bg-secondary rounded-xl" />
@@ -330,7 +332,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <h2 className="font-semibold text-sm">Profil</h2>
 
         <AvatarUpload currentAvatar={avatar} name={name} onUploaded={(url) => setAvatar(url)} />
@@ -382,7 +384,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <h2 className="font-semibold text-sm">Mot de passe</h2>
 
         {passwordError && (
@@ -447,7 +449,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm">Abonnement</h2>
           <span
@@ -517,7 +519,7 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              <div className="border border-violet-200 rounded-2xl p-5 space-y-4 bg-gradient-to-b from-violet-50/50 to-white hover:border-violet-400 transition-colors">
+              <div className="border border-violet-200 dark:border-violet-800 rounded-2xl p-5 space-y-4 bg-gradient-to-b from-violet-50/50 dark:from-violet-900/20 to-card hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
                     <Crown className="w-4 h-4 text-violet-500" />
@@ -561,7 +563,46 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-red-200 p-6 space-y-4">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+        <h2 className="font-semibold text-sm">Apparence</h2>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setTheme('light')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'light'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Sun className="w-4 h-4" />
+            Clair
+          </button>
+          <button
+            onClick={() => setTheme('dark')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'dark'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Moon className="w-4 h-4" />
+            Sombre
+          </button>
+          <button
+            onClick={() => setTheme('system')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'system'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            Système
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-card rounded-2xl border border-red-200 p-6 space-y-4">
         <h2 className="font-semibold text-sm text-red-600">Zone dangereuse</h2>
         <p className="text-sm text-muted-foreground">
           La suppression de votre compte est définitive. Toutes vos données seront effacées.

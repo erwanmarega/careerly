@@ -8,44 +8,44 @@ const COLUMNS = [
   {
     status: 'SENT',
     label: 'Envoyée',
-    headerCls: 'bg-slate-100 text-slate-700',
+    headerCls: 'bg-slate-100 text-slate-700 dark:bg-slate-800/60 dark:text-slate-300',
     dotCls: 'bg-slate-400',
-    overCls: 'bg-slate-50 ring-2 ring-slate-200',
+    overCls: 'bg-slate-50 ring-2 ring-slate-200 dark:bg-slate-800/30 dark:ring-slate-700',
   },
   {
     status: 'FOLLOW_UP',
     label: 'À relancer',
-    headerCls: 'bg-blue-50 text-blue-700',
+    headerCls: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     dotCls: 'bg-blue-400',
-    overCls: 'bg-blue-50 ring-2 ring-blue-200',
+    overCls: 'bg-blue-50 ring-2 ring-blue-200 dark:bg-blue-900/20 dark:ring-blue-800',
   },
   {
     status: 'INTERVIEW',
     label: 'Entretien',
-    headerCls: 'bg-emerald-50 text-emerald-700',
+    headerCls: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
     dotCls: 'bg-emerald-400',
-    overCls: 'bg-emerald-50 ring-2 ring-emerald-200',
+    overCls: 'bg-emerald-50 ring-2 ring-emerald-200 dark:bg-emerald-900/20 dark:ring-emerald-800',
   },
   {
     status: 'OFFER',
     label: 'Offre',
-    headerCls: 'bg-violet-50 text-violet-700',
+    headerCls: 'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
     dotCls: 'bg-violet-500',
-    overCls: 'bg-violet-50 ring-2 ring-violet-200',
+    overCls: 'bg-violet-50 ring-2 ring-violet-200 dark:bg-violet-900/20 dark:ring-violet-800',
   },
   {
     status: 'REJECTED',
     label: 'Refusé',
-    headerCls: 'bg-red-50 text-red-700',
+    headerCls: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
     dotCls: 'bg-red-400',
-    overCls: 'bg-red-50 ring-2 ring-red-200',
+    overCls: 'bg-red-50 ring-2 ring-red-200 dark:bg-red-900/20 dark:ring-red-800',
   },
   {
     status: 'ARCHIVED',
     label: 'Archivée',
-    headerCls: 'bg-slate-50 text-slate-500',
+    headerCls: 'bg-slate-50 text-slate-500 dark:bg-slate-800/40 dark:text-slate-400',
     dotCls: 'bg-slate-300',
-    overCls: 'bg-slate-100 ring-2 ring-slate-200',
+    overCls: 'bg-slate-100 ring-2 ring-slate-200 dark:bg-slate-800/30 dark:ring-slate-700',
   },
 ]
 
@@ -198,7 +198,7 @@ function KanbanCard({
       onClick={() => {
         if (!dragMoved.current) router.push(`/applications/${app.id}`)
       }}
-      className={`bg-white rounded-xl border border-border p-3 cursor-grab active:cursor-grabbing select-none transition-all duration-150 hover:shadow-sm hover:border-primary/20 group ${
+      className={`bg-card rounded-xl border border-border p-3 cursor-grab active:cursor-grabbing select-none transition-all duration-150 hover:shadow-sm hover:border-primary/20 group ${
         isDragging ? 'opacity-30 scale-95 shadow-none' : ''
       }`}
     >

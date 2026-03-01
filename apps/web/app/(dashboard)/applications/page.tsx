@@ -352,7 +352,7 @@ export default function ApplicationsPage() {
               onClick={switchToList}
               className={`flex items-center justify-center w-8 h-7 rounded-lg transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white shadow-sm text-foreground'
+                  ? 'bg-card shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Vue liste"
@@ -363,7 +363,7 @@ export default function ApplicationsPage() {
               onClick={switchToKanban}
               className={`flex items-center justify-center w-8 h-7 rounded-lg transition-colors ${
                 viewMode === 'kanban'
-                  ? 'bg-white shadow-sm text-foreground'
+                  ? 'bg-card shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Vue Kanban"
@@ -374,7 +374,7 @@ export default function ApplicationsPage() {
 
           <button
             onClick={openImport}
-            className="inline-flex items-center gap-2 border border-border bg-white text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors"
+            className="inline-flex items-center gap-2 border border-border bg-card text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors"
             title="Importer un CSV"
           >
             <Upload className="w-4 h-4" />
@@ -384,7 +384,7 @@ export default function ApplicationsPage() {
           <button
             onClick={handleExportCsv}
             disabled={exportingCsv}
-            className="inline-flex items-center gap-2 border border-border bg-white text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 border border-border bg-card text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={isFree ? 'Export CSV — Plan Pro requis' : 'Exporter en CSV'}
           >
             <Download className="w-4 h-4" />
@@ -409,7 +409,7 @@ export default function ApplicationsPage() {
             else setSearch(e.target.value)
           }}
           placeholder="Rechercher une entreprise ou un poste…"
-          className="w-full border border-border rounded-xl pl-10 pr-9 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-white"
+          className="w-full border border-border rounded-xl pl-10 pr-9 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
         />
         {search && (
           <button
@@ -434,14 +434,14 @@ export default function ApplicationsPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   statusFilter === s.value
                     ? 'bg-primary text-white'
-                    : 'bg-white border border-border text-muted-foreground hover:text-foreground'
+                    : 'bg-card border border-border text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {s.label}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 bg-white border border-border rounded-lg px-2.5 py-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5 bg-card border border-border rounded-lg px-2.5 py-1.5 flex-shrink-0">
             <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
             <select
               value={sort}
@@ -475,7 +475,7 @@ export default function ApplicationsPage() {
         ))}
 
       {viewMode === 'list' && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           {loading ? (
             <div className="divide-y divide-border">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -573,7 +573,7 @@ export default function ApplicationsPage() {
 
       {showCsvUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl border border-border shadow-xl w-full max-w-sm p-6">
+          <div className="bg-card rounded-2xl border border-border shadow-xl w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-semibold text-base">Fonctionnalité Pro</h2>
               <button
@@ -618,7 +618,7 @@ export default function ApplicationsPage() {
 
       {importOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl border border-border shadow-xl w-full max-w-md p-6">
+          <div className="bg-card rounded-2xl border border-border shadow-xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="font-semibold text-base">Importer un CSV</h2>
@@ -765,7 +765,7 @@ export default function ApplicationsPage() {
                         onChange={(e) =>
                           setColumnMapping((prev) => ({ ...prev, [key]: e.target.value }))
                         }
-                        className={`flex-1 text-xs border rounded-lg px-2.5 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-white ${
+                        className={`flex-1 text-xs border rounded-lg px-2.5 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card ${
                           required && !columnMapping[key]
                             ? 'border-amber-300 bg-amber-50/50'
                             : 'border-border'

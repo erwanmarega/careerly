@@ -72,7 +72,7 @@ function KpiCard({
   bg: string
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-border p-5">
+    <div className="bg-card rounded-2xl border border-border p-5">
       <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center mb-4`}>
         <Icon className={`w-4 h-4 ${color}`} />
       </div>
@@ -277,7 +277,7 @@ export default function StatsPage() {
     ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) + ' vs semaine dernière'
     : '—'
   const weekColor = weekDiff > 0 ? 'text-emerald-500' : weekDiff < 0 ? 'text-red-500' : 'text-slate-500'
-  const weekBg = weekDiff > 0 ? 'bg-emerald-50' : weekDiff < 0 ? 'bg-red-50' : 'bg-slate-50'
+  const weekBg = weekDiff > 0 ? 'bg-emerald-50 dark:bg-emerald-950/30' : weekDiff < 0 ? 'bg-red-50 dark:bg-red-950/30' : 'bg-slate-50 dark:bg-slate-800/40'
 
   const kpis = [
     {
@@ -286,7 +286,7 @@ export default function StatsPage() {
       sub: `${overview?.activeApplications ?? 0} actives`,
       icon: Send,
       color: 'text-blue-500',
-      bg: 'bg-blue-50',
+      bg: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       label: 'Taux de réponse',
@@ -294,7 +294,7 @@ export default function StatsPage() {
       sub: 'des candidatures',
       icon: TrendingUp,
       color: 'text-emerald-500',
-      bg: 'bg-emerald-50',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       label: "Taux d'entretien",
@@ -302,7 +302,7 @@ export default function StatsPage() {
       sub: 'des candidatures',
       icon: CalendarCheck,
       color: 'text-violet-500',
-      bg: 'bg-violet-50',
+      bg: 'bg-violet-50 dark:bg-violet-950/30',
     },
     {
       label: "Taux d'offre",
@@ -310,7 +310,7 @@ export default function StatsPage() {
       sub: 'des candidatures',
       icon: Trophy,
       color: 'text-amber-500',
-      bg: 'bg-amber-50',
+      bg: 'bg-amber-50 dark:bg-amber-950/30',
     },
     {
       label: 'Délai moyen de réponse',
@@ -318,7 +318,7 @@ export default function StatsPage() {
       sub: 'entre envoi et réponse',
       icon: Clock,
       color: 'text-slate-500',
-      bg: 'bg-slate-50',
+      bg: 'bg-slate-50 dark:bg-slate-800/40',
     },
     {
       label: 'Cette semaine',
@@ -337,32 +337,32 @@ export default function StatsPage() {
           value: overview.total,
           pct: 100,
           color: 'bg-blue-500',
-          light: 'bg-blue-50',
-          text: 'text-blue-700',
+          light: 'bg-blue-50 dark:bg-blue-900/30',
+          text: 'text-blue-700 dark:text-blue-400',
         },
         {
           label: 'Réponses reçues',
           value: Math.round((overview.responseRate / 100) * overview.total),
           pct: overview.responseRate,
           color: 'bg-emerald-500',
-          light: 'bg-emerald-50',
-          text: 'text-emerald-700',
+          light: 'bg-emerald-50 dark:bg-emerald-900/30',
+          text: 'text-emerald-700 dark:text-emerald-400',
         },
         {
           label: 'Entretiens obtenus',
           value: Math.round((overview.interviewRate / 100) * overview.total),
           pct: overview.interviewRate,
           color: 'bg-violet-500',
-          light: 'bg-violet-50',
-          text: 'text-violet-700',
+          light: 'bg-violet-50 dark:bg-violet-900/30',
+          text: 'text-violet-700 dark:text-violet-400',
         },
         {
           label: 'Offres reçues',
           value: Math.round((overview.offerRate / 100) * overview.total),
           pct: overview.offerRate,
           color: 'bg-amber-500',
-          light: 'bg-amber-50',
-          text: 'text-amber-700',
+          light: 'bg-amber-50 dark:bg-amber-900/30',
+          text: 'text-amber-700 dark:text-amber-400',
         },
       ]
     : []
@@ -381,7 +381,7 @@ export default function StatsPage() {
               onClick={() => setPeriod(p.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 period === p.value
-                  ? 'bg-white shadow-sm text-foreground'
+                  ? 'bg-card shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -398,7 +398,7 @@ export default function StatsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-semibold text-sm">Répartition par statut</h2>
             {!loading && byStatus.length > 0 && (
@@ -408,7 +408,7 @@ export default function StatsPage() {
                   aria-label="Vue barres"
                   className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
                     statusView === 'bar'
-                      ? 'bg-white text-foreground shadow-sm'
+                      ? 'bg-card text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -419,7 +419,7 @@ export default function StatsPage() {
                   aria-label="Vue camembert"
                   className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
                     statusView === 'pie'
-                      ? 'bg-white text-foreground shadow-sm'
+                      ? 'bg-card text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -470,7 +470,7 @@ export default function StatsPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <h2 className="font-semibold text-sm mb-5">Funnel de conversion</h2>
           {loading ? (
             <div className="space-y-3">

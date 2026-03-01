@@ -50,7 +50,7 @@ const comparison = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <header className="px-6 sm:px-10 py-5 flex items-center justify-between max-w-6xl mx-auto">
         <span className="font-black text-xl tracking-tight">Careerly</span>
         <div className="flex items-center gap-6">
@@ -82,7 +82,7 @@ export default function LandingPage() {
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-500 mb-8">
                 Gestion de candidatures
               </p>
-              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-[0.88] tracking-tighter text-white mb-8">
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl leading-[0.88] tracking-tighter text-white mb-8">
                 Vous postulez.
                 <br />
                 <span className="text-primary">On s'occupe</span>
@@ -96,7 +96,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 bg-primary text-white font-bold px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+                  className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
                 >
                   Essayer gratuitement
                   <ArrowRight className="w-4 h-4" />
@@ -381,7 +381,7 @@ export default function LandingPage() {
 
       <section className="bg-zinc-950 border-t-4 border-foreground">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-24">
-          <h2 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.88] tracking-tighter mb-12 max-w-4xl">
+          <h2 className="text-5xl sm:text-6xl lg:text-8xl text-white leading-[0.88] tracking-tighter mb-12 max-w-4xl">
             Votre prochaine
             <br />
             <span className="text-primary">candidature</span>

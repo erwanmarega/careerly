@@ -97,7 +97,7 @@ export default function DashboardPage() {
       sub: `${stats?.activeApplications ?? 0} actives`,
       icon: Send,
       color: 'text-blue-500',
-      bg: 'bg-blue-50',
+      bg: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       label: 'Taux de réponse',
@@ -105,7 +105,7 @@ export default function DashboardPage() {
       sub: 'des candidatures',
       icon: TrendingUp,
       color: 'text-emerald-500',
-      bg: 'bg-emerald-50',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       label: 'Entretiens',
@@ -113,7 +113,7 @@ export default function DashboardPage() {
       sub: 'des candidatures',
       icon: CalendarCheck,
       color: 'text-violet-500',
-      bg: 'bg-violet-50',
+      bg: 'bg-violet-50 dark:bg-violet-950/30',
     },
     {
       label: 'Offres',
@@ -121,7 +121,7 @@ export default function DashboardPage() {
       sub: "taux d'offre",
       icon: Trophy,
       color: 'text-amber-500',
-      bg: 'bg-amber-50',
+      bg: 'bg-amber-50 dark:bg-amber-950/30',
     },
   ]
 
@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl border border-border p-5">
+          <div key={s.label} className="bg-card rounded-2xl border border-border p-5">
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-4`}>
               <s.icon className={`w-4 h-4 ${s.color}`} />
             </div>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="lg:col-span-2 bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-sm">Candidatures récentes</h2>
@@ -253,7 +253,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-3.5 h-3.5 text-blue-500" />
@@ -313,7 +313,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Bell className="w-3.5 h-3.5 text-amber-500" />
