@@ -2,11 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bell, Plus, Send, CalendarCheck, Trophy, TrendingUp, RefreshCw } from 'lucide-react'
+import {
+  ArrowRight,
+  Bell,
+  Plus,
+  Send,
+  CalendarCheck,
+  Trophy,
+  TrendingUp,
+  RefreshCw,
+} from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 import { useStats } from '@/hooks/useStats'
 import { useApplications } from '@/hooks/useApplications'
-import { fetchApplications, STATUS_LABELS, STATUS_STYLES, type Application } from '@/lib/applications'
+import {
+  fetchApplications,
+  STATUS_LABELS,
+  STATUS_STYLES,
+  type Application,
+} from '@/lib/applications'
 import { api } from '@/lib/api'
 
 interface Reminder {
@@ -46,13 +60,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchApplications({ status: 'FOLLOW_UP', limit: 4 })
-      .then((res) => { setFollowUp(res.data); setFollowUpTotal(res.total) })
+      .then((res) => {
+        setFollowUp(res.data)
+        setFollowUpTotal(res.total)
+      })
       .catch(() => {})
       .finally(() => setFollowUpLoading(false))
   }, [])
 
   useEffect(() => {
-    api.get<Reminder[]>('/reminders')
+    api
+      .get<Reminder[]>('/reminders')
       .then(setReminders)
       .catch(() => {})
       .finally(() => setRemindersLoading(false))
@@ -100,7 +118,7 @@ export default function DashboardPage() {
     {
       label: 'Offres',
       value: `${stats?.offerRate ?? 0}%`,
-      sub: 'taux d\'offre',
+      sub: "taux d'offre",
       icon: Trophy,
       color: 'text-amber-500',
       bg: 'bg-amber-50',
@@ -116,7 +134,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -158,7 +175,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div className="lg:col-span-2 bg-white rounded-2xl border border-border overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
@@ -190,7 +206,9 @@ export default function DashboardPage() {
             </div>
           ) : applications.length === 0 ? (
             <div className="px-6 py-16 text-center">
-              <p className="text-sm text-muted-foreground">Aucune candidature pour l&apos;instant.</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune candidature pour l&apos;instant.
+              </p>
               <Link
                 href="/applications/new"
                 className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline underline-offset-4"
@@ -235,7 +253,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-4">
-
           <div className="bg-white rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -341,7 +358,9 @@ export default function DashboardPage() {
                         <p className="text-xs text-muted-foreground truncate">
                           {r.application.company} · {r.application.position}
                         </p>
-                        <p className={`text-xs mt-0.5 ${overdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                        <p
+                          className={`text-xs mt-0.5 ${overdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}
+                        >
                           {overdue ? 'En retard · ' : ''}
                           {new Date(r.scheduledAt).toLocaleDateString('fr-FR', {
                             day: 'numeric',

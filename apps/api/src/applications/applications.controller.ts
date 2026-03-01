@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,10 +10,14 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ApplicationStatus } from '@prisma/client'
 import type { User } from '@prisma/client'
+import { memoryStorage } from 'multer'
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CurrentUser } from '../common/decorators/current-user.decorator'
@@ -51,6 +56,26 @@ export class ApplicationsController {
     return this.applicationsService.create(user.id, dto)
   }
 
+  @Post('import')
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  importCsv(
+    @CurrentUser() user: User,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('mapping') mappingJson?: string,
+  ) {
+    if (!file) throw new BadRequestException('No file provided')
+    const csvText = file.buffer.toString('utf-8')
+    let columnMapping: Record<string, string> | undefined
+    if (mappingJson) {
+      try {
+        columnMapping = JSON.parse(mappingJson)
+      } catch {
+        /**/
+      }
+    }
+    return this.applicationsService.importFromCsv(user.id, csvText, columnMapping)
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: User) {
     return this.applicationsService.findOne(id, user.id)
@@ -62,11 +87,7 @@ export class ApplicationsController {
   }
 
   @Patch(':id/status')
-  updateStatus(
-    @Param('id') id: string,
-    @CurrentUser() user: User,
-    @Body() dto: UpdateStatusDto,
-  ) {
+  updateStatus(@Param('id') id: string, @CurrentUser() user: User, @Body() dto: UpdateStatusDto) {
     return this.applicationsService.updateStatus(id, user.id, dto)
   }
 

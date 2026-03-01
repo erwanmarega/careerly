@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send, TrendingUp, CalendarCheck, Trophy, BarChart2, PieChart as PieChartIcon } from 'lucide-react'
+import { Send, TrendingUp, CalendarCheck, Trophy, BarChart2, PieChart as PieChartIcon, Clock, Activity } from 'lucide-react'
 import { api } from '@/lib/api'
 import { STATUS_LABELS } from '@/lib/applications'
 
@@ -11,6 +11,9 @@ interface StatsOverview {
   interviewRate: number
   offerRate: number
   activeApplications: number
+  avgResponseDays: number | null
+  thisWeekCount: number
+  lastWeekCount: number
 }
 
 interface StatusStat {
@@ -41,6 +44,13 @@ const STATUS_PIE_COLORS: Record<string, string> = {
   REJECTED: '#f87171',
   ARCHIVED: '#cbd5e1',
 }
+
+const PERIODS = [
+  { value: '7d', label: '7 jours' },
+  { value: '30d', label: '30 jours' },
+  { value: '90d', label: '3 mois' },
+  { value: 'all', label: 'Tout' },
+]
 
 function Skeleton({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return <div className={`animate-pulse bg-secondary rounded-lg ${className}`} style={style} />
@@ -243,12 +253,15 @@ export default function StatsPage() {
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [statusView, setStatusView] = useState<'bar' | 'pie'>('bar')
+  const [period, setPeriod] = useState('all')
 
   useEffect(() => {
+    setLoading(true)
+    const q = period !== 'all' ? `?period=${period}` : ''
     Promise.all([
-      api.get<StatsOverview>('/stats/overview'),
-      api.get<StatusStat[]>('/stats/by-status'),
-      api.get<{ data: TimelineEntry[] }>('/stats/timeline'),
+      api.get<StatsOverview>(`/stats/overview${q}`),
+      api.get<StatusStat[]>(`/stats/by-status${q}`),
+      api.get<{ data: TimelineEntry[] }>(`/stats/timeline${q}`),
     ])
       .then(([ov, st, tl]) => {
         setOverview(ov)
@@ -257,7 +270,14 @@ export default function StatsPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [period])
+
+  const weekDiff = (overview?.thisWeekCount ?? 0) - (overview?.lastWeekCount ?? 0)
+  const weekSubLabel = overview
+    ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) + ' vs semaine dernière'
+    : '—'
+  const weekColor = weekDiff > 0 ? 'text-emerald-500' : weekDiff < 0 ? 'text-red-500' : 'text-slate-500'
+  const weekBg = weekDiff > 0 ? 'bg-emerald-50' : weekDiff < 0 ? 'bg-red-50' : 'bg-slate-50'
 
   const kpis = [
     {
@@ -277,7 +297,7 @@ export default function StatsPage() {
       bg: 'bg-emerald-50',
     },
     {
-      label: 'Taux d\'entretien',
+      label: "Taux d'entretien",
       value: `${overview?.interviewRate ?? 0}%`,
       sub: 'des candidatures',
       icon: CalendarCheck,
@@ -285,12 +305,28 @@ export default function StatsPage() {
       bg: 'bg-violet-50',
     },
     {
-      label: 'Taux d\'offre',
+      label: "Taux d'offre",
       value: `${overview?.offerRate ?? 0}%`,
       sub: 'des candidatures',
       icon: Trophy,
       color: 'text-amber-500',
       bg: 'bg-amber-50',
+    },
+    {
+      label: 'Délai moyen de réponse',
+      value: overview?.avgResponseDays != null ? `${overview.avgResponseDays}j` : '—',
+      sub: 'entre envoi et réponse',
+      icon: Clock,
+      color: 'text-slate-500',
+      bg: 'bg-slate-50',
+    },
+    {
+      label: 'Cette semaine',
+      value: overview?.thisWeekCount ?? 0,
+      sub: overview ? weekSubLabel : '—',
+      icon: Activity,
+      color: weekColor,
+      bg: weekBg,
     },
   ]
 
@@ -333,14 +369,31 @@ export default function StatsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Statistiques</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Vue globale de votre recherche d&apos;emploi</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Statistiques</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Vue globale de votre recherche d&apos;emploi</p>
+        </div>
+        <div className="flex items-center p-1 bg-secondary rounded-xl border border-border">
+          {PERIODS.map((p) => (
+            <button
+              key={p.value}
+              onClick={() => setPeriod(p.value)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                period === p.value
+                  ? 'bg-white shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
-          ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)
+          ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)
           : kpis.map((k) => <KpiCard key={k.label} {...k} />)}
       </div>
 
