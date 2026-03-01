@@ -295,7 +295,7 @@ export default function LandingPage() {
           <p className="text-muted-foreground mb-12 text-sm">
             Commencez gratuit, passez Pro si vous en avez besoin.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
             <div className="border border-border rounded-2xl p-7">
               <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-6">
                 Free
@@ -331,9 +331,10 @@ export default function LandingPage() {
                 {[
                   'Candidatures illimitées',
                   'Rappels de relance',
-                  'Statistiques',
-                  'Export PDF',
+                  'Statistiques avancées',
+                  'Export CSV & PDF',
                   'Historique des statuts',
+                  'Assistant IA (bientôt)',
                 ].map((f) => (
                   <li key={f} className="text-sm flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -346,33 +347,6 @@ export default function LandingPage() {
                 className="block text-center text-sm font-bold bg-primary text-white rounded-xl py-3 hover:bg-primary/90 transition-colors"
               >
                 Passer en Pro
-              </Link>
-            </div>
-
-            <div className="border border-border rounded-2xl p-7 bg-zinc-950 text-white">
-              <div className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-6">
-                Premium
-              </div>
-              <div className="text-5xl font-black mb-1">14€</div>
-              <p className="text-sm text-zinc-500 mb-8">par mois</p>
-              <ul className="space-y-2.5 mb-8">
-                {[
-                  'Tout le plan Pro',
-                  'Assistant IA',
-                  'Lettres de motivation',
-                  'Support prioritaire',
-                ].map((f) => (
-                  <li key={f} className="text-sm flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-zinc-600 flex-shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/register?plan=premium"
-                className="block text-center text-sm font-bold bg-white text-zinc-950 rounded-xl py-3 hover:bg-zinc-100 transition-colors"
-              >
-                Passer en Premium
               </Link>
             </div>
           </div>

@@ -81,9 +81,8 @@ export class StripeService {
   private async syncSubscription(subscription: Stripe.Subscription) {
     const priceId = subscription.items.data[0]?.price.id
     const proPriceId = this.config.get('STRIPE_PRO_PRICE_ID')
-    const premiumPriceId = this.config.get('STRIPE_PREMIUM_PRICE_ID')
 
-    const plan = priceId === premiumPriceId ? Plan.PREMIUM : priceId === proPriceId ? Plan.PRO : Plan.FREE
+    const plan = priceId === proPriceId ? Plan.PRO : Plan.FREE
 
     await this.prisma.user.update({
       where: { stripeCustomerId: subscription.customer as string },

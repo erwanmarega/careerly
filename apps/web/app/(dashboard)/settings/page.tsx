@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Camera, CheckCircle2, Crown, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
+import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
 import { useUser } from '@/hooks/useUser'
@@ -14,13 +14,11 @@ const inputCls =
 const PLAN_LABELS: Record<string, string> = {
   FREE: 'Gratuit',
   PRO: 'Pro',
-  PREMIUM: 'Premium',
 }
 
 const PLAN_STYLES: Record<string, string> = {
   FREE: 'bg-secondary text-muted-foreground',
   PRO: 'bg-blue-100 text-blue-700',
-  PREMIUM: 'bg-violet-100 text-violet-700',
 }
 
 function AvatarUpload({
@@ -292,7 +290,7 @@ export default function SettingsPage() {
   }
 
   const plan = user?.plan ?? 'FREE'
-  const isPaid = plan === 'PRO' || plan === 'PREMIUM'
+  const isPaid = plan === 'PRO'
 
   if (loading) {
     return (
@@ -479,83 +477,47 @@ export default function SettingsPage() {
               Passez à un plan payant pour accéder aux rappels, aux statistiques avancées et plus
               encore.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="border border-border rounded-2xl p-5 space-y-4 hover:border-blue-300 transition-colors">
+            <div className="max-w-sm">
+              <div className="border-2 border-primary rounded-2xl p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-blue-500" />
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold">Pro</p>
-                    <p className="text-xs text-muted-foreground">9€ / mois</p>
+                    <p className="text-xs text-muted-foreground">8€ / mois</p>
                   </div>
                 </div>
                 <ul className="space-y-1.5 text-xs text-muted-foreground">
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Candidatures illimitées
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Rappels par email
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Statistiques avancées
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                    Export CSV
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    Export CSV &amp; PDF
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    Assistant IA (bientôt)
                   </li>
                 </ul>
                 <button
                   onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!)}
                   disabled={checkoutLoading !== null}
-                  className="w-full py-2 text-xs font-semibold bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-2 text-xs font-semibold bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {checkoutLoading === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
                     ? 'Chargement…'
                     : 'Passer en Pro'}
-                </button>
-              </div>
-
-              <div className="border border-violet-200 dark:border-violet-800 rounded-2xl p-5 space-y-4 bg-gradient-to-b from-violet-50/50 dark:from-violet-900/20 to-card hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-violet-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold">Premium</p>
-                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">
-                        Populaire
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">19€ / mois</p>
-                  </div>
-                </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Tout le plan Pro
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Export PDF
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Fonctionnalités IA (bientôt)
-                  </li>
-                </ul>
-                <button
-                  onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID!)}
-                  disabled={checkoutLoading !== null}
-                  className="w-full py-2 text-xs font-semibold bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {checkoutLoading === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID
-                    ? 'Chargement…'
-                    : 'Passer en Premium'}
                 </button>
               </div>
             </div>
