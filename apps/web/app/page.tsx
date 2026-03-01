@@ -295,7 +295,7 @@ export default function LandingPage() {
           <p className="text-muted-foreground mb-12 text-sm">
             Commencez gratuit, passez Pro si vous en avez besoin.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             <div className="border border-border rounded-2xl p-7">
               <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-6">
                 Free

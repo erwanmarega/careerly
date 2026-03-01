@@ -1,7 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send, TrendingUp, CalendarCheck, Trophy, BarChart2, PieChart as PieChartIcon, Clock, Activity } from 'lucide-react'
+import {
+  Send,
+  TrendingUp,
+  CalendarCheck,
+  Trophy,
+  BarChart2,
+  PieChart as PieChartIcon,
+  Clock,
+  Activity,
+} from 'lucide-react'
 import { api } from '@/lib/api'
 import { STATUS_LABELS } from '@/lib/applications'
 
@@ -147,7 +156,9 @@ function PieChart({ data }: { data: StatusStat[] }) {
             style={{
               transformOrigin: `${cx}px ${cy}px`,
               ...(ready
-                ? { animation: `pie-slice-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 75}ms both` }
+                ? {
+                    animation: `pie-slice-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 75}ms both`,
+                  }
                 : { transform: 'scale(0)', opacity: 0 }),
             }}
           >
@@ -166,33 +177,37 @@ function PieChart({ data }: { data: StatusStat[] }) {
       </svg>
 
       <div className="space-y-2.5 flex-1 min-w-0">
-        {[...slices].sort((a, b) => b.count - a.count).map((slice, i) => (
-          <div
-            key={`${slice.status}-legend-${animKey.current}`}
-            className="flex items-center gap-2"
-            onMouseEnter={() => setHovered(slice.status)}
-            onMouseLeave={() => setHovered(null)}
-            style={
-              ready
-                ? { animation: `pie-legend-in 0.35s ease-out ${i * 60 + 150}ms both` }
-                : { opacity: 0 }
-            }
-          >
+        {[...slices]
+          .sort((a, b) => b.count - a.count)
+          .map((slice, i) => (
             <div
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-150"
-              style={{
-                backgroundColor: STATUS_PIE_COLORS[slice.status] ?? '#6366f1',
-                transform: hovered === slice.status ? 'scale(1.5)' : 'scale(1)',
-              }}
-            />
-            <span className={`text-xs truncate transition-all duration-150 ${hovered === slice.status ? 'font-medium' : ''}`}>
-              {STATUS_LABELS[slice.status] ?? slice.status}
-            </span>
-            <span className="text-xs text-muted-foreground tabular-nums ml-auto flex-shrink-0">
-              {slice.count} · {slice.percentage}%
-            </span>
-          </div>
-        ))}
+              key={`${slice.status}-legend-${animKey.current}`}
+              className="flex items-center gap-2"
+              onMouseEnter={() => setHovered(slice.status)}
+              onMouseLeave={() => setHovered(null)}
+              style={
+                ready
+                  ? { animation: `pie-legend-in 0.35s ease-out ${i * 60 + 150}ms both` }
+                  : { opacity: 0 }
+              }
+            >
+              <div
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-150"
+                style={{
+                  backgroundColor: STATUS_PIE_COLORS[slice.status] ?? '#6366f1',
+                  transform: hovered === slice.status ? 'scale(1.5)' : 'scale(1)',
+                }}
+              />
+              <span
+                className={`text-xs truncate transition-all duration-150 ${hovered === slice.status ? 'font-medium' : ''}`}
+              >
+                {STATUS_LABELS[slice.status] ?? slice.status}
+              </span>
+              <span className="text-xs text-muted-foreground tabular-nums ml-auto flex-shrink-0">
+                {slice.count} · {slice.percentage}%
+              </span>
+            </div>
+          ))}
       </div>
     </div>
   )
@@ -213,7 +228,10 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
     <div className="space-y-3">
       <div className="flex items-end gap-1.5 h-28">
         {data.map((entry) => (
-          <div key={entry.date} className="flex-1 flex flex-col items-center gap-1 h-full justify-end group relative">
+          <div
+            key={entry.date}
+            className="flex-1 flex flex-col items-center gap-1 h-full justify-end group relative"
+          >
             <div
               className="w-full bg-primary/80 rounded-t-md transition-all duration-500 hover:bg-primary cursor-default min-h-[3px]"
               style={{ height: `${max > 0 ? (entry.count / max) * 100 : 0}%` }}
@@ -276,8 +294,14 @@ export default function StatsPage() {
   const weekSubLabel = overview
     ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) + ' vs semaine dernière'
     : '—'
-  const weekColor = weekDiff > 0 ? 'text-emerald-500' : weekDiff < 0 ? 'text-red-500' : 'text-slate-500'
-  const weekBg = weekDiff > 0 ? 'bg-emerald-50 dark:bg-emerald-950/30' : weekDiff < 0 ? 'bg-red-50 dark:bg-red-950/30' : 'bg-slate-50 dark:bg-slate-800/40'
+  const weekColor =
+    weekDiff > 0 ? 'text-emerald-500' : weekDiff < 0 ? 'text-red-500' : 'text-slate-500'
+  const weekBg =
+    weekDiff > 0
+      ? 'bg-emerald-50 dark:bg-emerald-950/30'
+      : weekDiff < 0
+        ? 'bg-red-50 dark:bg-red-950/30'
+        : 'bg-slate-50 dark:bg-slate-800/40'
 
   const kpis = [
     {
@@ -372,7 +396,9 @@ export default function StatsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Statistiques</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Vue globale de votre recherche d&apos;emploi</p>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Vue globale de votre recherche d&apos;emploi
+          </p>
         </div>
         <div className="flex items-center p-1 bg-secondary rounded-xl border border-border">
           {PERIODS.map((p) => (
@@ -393,7 +419,9 @@ export default function StatsPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
-          ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-36 rounded-2xl" />
+            ))
           : kpis.map((k) => <KpiCard key={k.label} {...k} />)}
       </div>
 
@@ -495,9 +523,7 @@ export default function StatsPage() {
                       {step.value}
                     </span>
                   </div>
-                  {i < funnelSteps.length - 1 && (
-                    <div className="w-px h-2 bg-border ml-4" />
-                  )}
+                  {i < funnelSteps.length - 1 && <div className="w-px h-2 bg-border ml-4" />}
                 </div>
               ))}
             </div>
@@ -505,12 +531,13 @@ export default function StatsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6">
+      <div className="bg-card rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-semibold text-sm">Activité</h2>
+          <h2 className="font-semibold dark:text-white text-sm">Activité</h2>
           {!loading && timeline.length > 0 && (
             <span className="text-xs text-muted-foreground">
-              {timeline.reduce((s, d) => s + d.count, 0)} candidatures sur {timeline.length} jour{timeline.length > 1 ? 's' : ''}
+              {timeline.reduce((s, d) => s + d.count, 0)} candidatures sur {timeline.length} jour
+              {timeline.length > 1 ? 's' : ''}
             </span>
           )}
         </div>
