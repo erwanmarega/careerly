@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Careerly",
+  "version": "1.0.0",
+  "description": "Ajoutez une candidature Careerly directement depuis une offre d'emploi.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Ajouter une candidature"
+  }
+}

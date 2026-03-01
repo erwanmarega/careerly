@@ -1,0 +1,20 @@
+node_modules
+.turbo
+dist
+.next
+.env
+.env.local
+*.env
+!*.env.example
+!*.env.local.example
+coverage
+*.log
+.DS_Store
+
+# Fichiers uploadés par les utilisateurs (les .gitkeep sont conservés)
+apps/api/public/uploads/**/*.jpg
+apps/api/public/uploads/**/*.jpeg
+apps/api/public/uploads/**/*.png
+apps/api/public/uploads/**/*.webp
+apps/api/public/uploads/**/*.gif
+apps/api/public/uploads/**/*.avif

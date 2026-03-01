@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careerly</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="view-loading" class="view">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Login -->
+  <div id="view-login" class="view hidden">
+    <div class="header">
+      <span class="logo">Careerly</span>
+    </div>
+    <div class="content">
+      <p class="subtitle">Connectez-vous pour ajouter des candidatures depuis n'importe quelle offre.</p>
+      <div id="login-error" class="error-box hidden"></div>
+      <form id="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="vous@exemple.com" required />
+        </div>
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" id="login-btn" class="btn-primary">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main form -->
+  <div id="view-main" class="view hidden">
+    <div class="header">
+      <span class="logo">Careerly</span>
+      <div class="header-right">
+        <span id="user-email" class="user-email"></span>
+        <button id="logout-btn" class="btn-ghost">Déco.</button>
+      </div>
+    </div>
+    <div class="content">
+      <p class="section-label">Nouvelle candidature</p>
+      <div id="extract-banner" class="extract-banner hidden">
+        <span class="extract-dot"></span>
+        <span id="extract-source">Infos extraites de la page</span>
+      </div>
+      <div id="main-error" class="error-box hidden"></div>
+      <form id="main-form">
+        <div class="field">
+          <label for="company">Entreprise <span class="required">*</span></label>
+          <input id="company" type="text" placeholder="ex : Spotify, Doctolib…" required />
+        </div>
+        <div class="field">
+          <label for="position">Poste <span class="required">*</span></label>
+          <input id="position" type="text" placeholder="ex : Product Designer, Dev Frontend…" required />
+        </div>
+        <div class="field">
+          <label for="location">Lieu</label>
+          <input id="location" type="text" placeholder="ex : Paris, Remote…" />
+        </div>
+        <div class="field">
+          <label for="status">Statut</label>
+          <select id="status">
+            <option value="SENT">Envoyée</option>
+            <option value="FOLLOW_UP">À relancer</option>
+            <option value="INTERVIEW">Entretien</option>
+            <option value="OFFER">Offre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="url">Lien de l'offre</label>
+          <input id="url" type="url" placeholder="https://…" />
+        </div>
+        <button type="submit" id="submit-btn" class="btn-primary">
+          Ajouter la candidature
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div id="view-success" class="view hidden">
+    <div class="success-content">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Candidature ajoutée !</h2>
+      <p id="success-desc" class="success-desc"></p>
+      <div class="success-actions">
+        <a id="open-app-btn" href="#" target="_blank" class="btn-primary">Voir dans Careerly</a>
+        <button id="add-another-btn" class="btn-ghost">Ajouter une autre</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
