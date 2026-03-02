@@ -149,7 +149,7 @@ function AvatarUpload({
 }
 
 export default function SettingsPage() {
-  const { user, loading } = useUser()
+  const { user, loading, refresh } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { theme, setTheme } = useTheme()
@@ -175,6 +175,10 @@ export default function SettingsPage() {
 
   const stripeSuccess = searchParams.get('success') === 'true'
   const stripeCanceled = searchParams.get('canceled') === 'true'
+
+  useEffect(() => {
+    if (stripeSuccess) refresh()
+  }, [stripeSuccess])
 
   const initialized = useRef(false)
   useEffect(() => {

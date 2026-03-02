@@ -63,6 +63,6 @@ export class AuthController {
       onboarding_completed: String(user.onboardingCompleted),
     })
     const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL')
-    res.redirect(`${frontendUrl}/auth/callback?${params.toString()}`)
+    res.redirect(`${frontendUrl}/callback?${params.toString()}`)
   }
 }

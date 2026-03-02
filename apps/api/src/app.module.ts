@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ThrottlerModule } from '@nestjs/throttler'
 
+import { AiModule } from './ai/ai.module'
 import { ApplicationsModule } from './applications/applications.module'
 import { AuthModule } from './auth/auth.module'
 import { MailModule } from './mail/mail.module'
@@ -37,6 +38,7 @@ import { UsersModule } from './users/users.module'
     RemindersModule,
     StripeModule,
     MailModule,
+    AiModule,
   ],
 })
 export class AppModule {}
