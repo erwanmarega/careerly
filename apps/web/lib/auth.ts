@@ -6,7 +6,7 @@ export interface AuthUser {
   name: string | null
   plan: string
   avatar: string | null
-  onboardingCompleted: boolean
+  onboardingCompleted?: boolean
 }
 
 interface AuthResponse {

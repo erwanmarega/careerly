@@ -220,6 +220,7 @@ export default function SettingsPage() {
         name: updated.name,
         plan: updated.plan,
         avatar: avatar,
+        onboardingCompleted: true,
       })
       setProfileSuccess(true)
       setTimeout(() => setProfileSuccess(false), 3000)
