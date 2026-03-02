@@ -130,7 +130,7 @@ export default function ParticleRect({ children }: { children: React.ReactNode }
     const canvas = canvasRef.current
     if (!wrap || !canvas) return
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     if (!ctx) return
 
     const { width: w, height: h } = wrap.getBoundingClientRect()
