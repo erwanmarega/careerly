@@ -77,6 +77,7 @@ function AvatarUpload({
         name: updated.name,
         plan: updated.plan,
         avatar: updated.avatar ?? null,
+        onboardingCompleted: true,
       })
       onUploaded(updated.avatar ?? objectUrl)
     } catch (err) {
