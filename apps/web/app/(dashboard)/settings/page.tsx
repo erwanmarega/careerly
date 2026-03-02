@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useRef, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
@@ -154,7 +154,6 @@ function AvatarUpload({
 export default function SettingsPage() {
   const { user, loading, refresh } = useUser()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { theme, setTheme } = useTheme()
 
   const [name, setName] = useState('')
@@ -176,12 +175,17 @@ export default function SettingsPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  const stripeSuccess = searchParams.get('success') === 'true'
-  const stripeCanceled = searchParams.get('canceled') === 'true'
+  const [stripeSuccess, setStripeSuccess] = useState(false)
+  const [stripeCanceled, setStripeCanceled] = useState(false)
 
   useEffect(() => {
-    if (stripeSuccess) refresh()
-  }, [stripeSuccess])
+    const params = new URLSearchParams(window.location.search)
+    const success = params.get('success') === 'true'
+    const canceled = params.get('canceled') === 'true'
+    setStripeSuccess(success)
+    setStripeCanceled(canceled)
+    if (success) refresh()
+  }, [])
 
   const initialized = useRef(false)
   useEffect(() => {

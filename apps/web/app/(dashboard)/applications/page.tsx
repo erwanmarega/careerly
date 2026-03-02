@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import {
   ArrowRight,
   ArrowUpDown,
@@ -111,8 +110,6 @@ function Skeleton({ className }: { className?: string }) {
 const LIMIT = 20
 
 export default function ApplicationsPage() {
-  const searchParams = useSearchParams()
-  const initialStatus = searchParams.get('status') ?? ''
   const { user } = useUser()
   const isFree = user?.plan === 'FREE'
 
@@ -121,7 +118,7 @@ export default function ApplicationsPage() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState(initialStatus)
+  const [statusFilter, setStatusFilter] = useState('')
   const [sort, setSort] = useState('appliedAt:desc')
   const [exportingCsv, setExportingCsv] = useState(false)
   const [showCsvUpgradeModal, setShowCsvUpgradeModal] = useState(false)
@@ -168,6 +165,8 @@ export default function ApplicationsPage() {
   }
 
   useEffect(() => {
+    const initialStatus = new URLSearchParams(window.location.search).get('status') ?? ''
+    setStatusFilter(initialStatus)
     load('', initialStatus, 1, 'appliedAt:desc')
   }, [])
 

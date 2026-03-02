@@ -2,11 +2,11 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { setTokens, storeUser, type AuthUser } from '@/lib/auth'
 
-export default function CallbackPage() {
+function CallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
 
@@ -30,9 +30,16 @@ export default function CallbackPage() {
     router.replace(onboardingCompleted ? '/dashboard' : '/onboarding')
   }, [params, router])
 
+  return null
+}
+
+export default function CallbackPage() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <p className="text-sm text-muted-foreground">Connexion en cours…</p>
+      <Suspense fallback={null}>
+        <CallbackContent />
+      </Suspense>
     </div>
   )
 }
