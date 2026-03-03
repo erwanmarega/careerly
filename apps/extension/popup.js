@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001'
+const API_URL = 'https://careerly-production.up.railway.app'
 
 let accessToken = null
 let createdAppId = null
@@ -217,7 +217,7 @@ async function handleSubmit(e) {
 
     createdAppId = json.data.id
     $('success-desc').textContent = `${body.position} chez ${body.company}`
-    $('open-app-btn').href = `http://localhost:3000/applications/${createdAppId}`
+    $('open-app-btn').href = `https://careerly-web.vercel.app/applications/${createdAppId}`
     showView('view-success')
   } catch (err) {
     errorBox.textContent = err.message || 'Une erreur est survenue'
