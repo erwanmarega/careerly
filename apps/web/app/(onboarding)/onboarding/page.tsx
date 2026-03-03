@@ -116,7 +116,7 @@ export default function OnboardingPage() {
           </p>
 
           {error && (
-            <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+            <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
@@ -165,8 +165,8 @@ export default function OnboardingPage() {
 
       {step === 2 && (
         <div className="animate-in fade-in duration-300 text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-8">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+          <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-8">
+            <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           </div>
           <h2 className="text-3xl font-black tracking-tight mb-3">
             Tout est prêt !
