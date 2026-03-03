@@ -29,8 +29,10 @@ model User {
   avatar           String?
   plan             Plan     @default(FREE)
   stripeCustomerId String?  @unique
-  refreshToken        String?
-  onboardingCompleted Boolean  @default(false)
+  refreshToken         String?
+  resetPasswordToken   String?
+  resetPasswordExpiry  DateTime?
+  onboardingCompleted  Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

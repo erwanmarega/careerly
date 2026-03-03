@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import type { User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
+import { randomBytes } from 'crypto'
 
+import { MailService } from '../mail/mail.service'
 import { PrismaService } from '../prisma/prisma.service'
 import type { LoginDto } from './dto/login.dto'
 import type { RegisterDto } from './dto/register.dto'
@@ -14,6 +16,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -73,6 +76,37 @@ export class AuthService {
     const tokens = await this.generateTokens(user)
     await this.updateRefreshToken(user.id, tokens.refreshToken)
     return { tokens, user: this.sanitize(user) }
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } })
+    if (!user) return
+
+    const token = randomBytes(32).toString('hex')
+    const expiry = new Date(Date.now() + 60 * 60 * 1000)
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetPasswordToken: token, resetPasswordExpiry: expiry },
+    })
+
+    await this.mail.sendPasswordResetEmail(user.email, user.name ?? '', token)
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpiry: { gt: new Date() },
+      },
+    })
+    if (!user) throw new BadRequestException('Token invalide ou expiré')
+
+    const hashed = await bcrypt.hash(newPassword, 10)
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashed, resetPasswordToken: null, resetPasswordExpiry: null },
+    })
   }
 
   private async generateTokens(user: User) {

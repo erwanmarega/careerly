@@ -11,16 +11,16 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true })
 
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  })
+
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
   )
-
-  app.enableCors({
-    origin: true,
-    credentials: true,
-  })
 
   app.useStaticAssets(join(process.cwd(), 'public'), {
     prefix: '/',

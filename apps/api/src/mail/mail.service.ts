@@ -61,6 +61,41 @@ export class MailService {
     }
   }
 
+  async sendPasswordResetEmail(to: string, name: string, token: string) {
+    const resetUrl = `${this.frontendUrl}/reset-password?token=${token}`
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
+    <div style="background:#6d28d9;padding:20px 28px;">
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Careerly</span>
+    </div>
+    <div style="padding:28px 28px 8px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#6b7280;">Bonjour ${name},</p>
+      <h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#111827;">Réinitialisation de mot de passe</h2>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">Vous avez demandé à réinitialiser votre mot de passe. Ce lien est valable <strong>1 heure</strong>.</p>
+      <a href="${resetUrl}" style="display:inline-block;background:#6d28d9;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:11px 22px;border-radius:8px;margin-bottom:28px;">Réinitialiser mon mot de passe →</a>
+      <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">Si vous n'avez pas fait cette demande, ignorez cet email.</p>
+    </div>
+    <div style="padding:12px 28px 16px;border-top:1px solid #f3f4f6;">
+      <p style="margin:0;font-size:11px;color:#9ca3af;">Careerly — Votre assistant de recherche d'emploi</p>
+    </div>
+  </div>
+</body>
+</html>`
+
+    const { error } = await this.resend.emails.send({
+      from: this.from,
+      to,
+      subject: 'Réinitialisation de votre mot de passe Careerly',
+      html,
+    })
+    if (error) {
+      this.logger.error('Failed to send password reset email', error)
+      throw new Error(`Resend error: ${error.message}`)
+    }
+  }
+
   async sendWelcomeEmail(to: string, name: string) {
     try {
       await this.resend.emails.send({

@@ -6,8 +6,10 @@ import type { Request, Response } from 'express'
 
 import { CurrentUser } from '../common/decorators/current-user.decorator'
 import { AuthService } from './auth.service'
+import { ForgotPasswordDto } from './dto/forgot-password.dto'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Controller('auth')
@@ -40,6 +42,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   refresh(@CurrentUser() user: User & { refreshToken: string }) {
     return this.authService.refresh(user.id, user.refreshToken)
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email)
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.password)
   }
 
   @Get('google')
