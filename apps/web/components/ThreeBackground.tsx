@@ -9,15 +9,16 @@ export default function ThreeBackground({ className }: { className?: string }) {
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
+    const el: HTMLDivElement = mount
 
     import('three').then((THREE) => {
-      const w = mount.clientWidth || innerWidth
-      const h = mount.clientHeight || innerHeight
+      const w = el.clientWidth || innerWidth
+      const h = el.clientHeight || innerHeight
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
       renderer.setSize(w, h)
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-      mount.appendChild(renderer.domElement)
+      el.appendChild(renderer.domElement)
 
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100)
@@ -94,8 +95,8 @@ export default function ThreeBackground({ className }: { className?: string }) {
       tick()
 
       function onResize() {
-        const w = mount.clientWidth
-        const h = mount.clientHeight
+        const w = el.clientWidth
+        const h = el.clientHeight
         camera.aspect = w / h
         camera.updateProjectionMatrix()
         renderer.setSize(w, h)
