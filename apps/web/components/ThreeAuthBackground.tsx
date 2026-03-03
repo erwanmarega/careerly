@@ -9,15 +9,16 @@ export default function ThreeAuthBackground({ className }: { className?: string 
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
+    const el: HTMLDivElement = mount
 
     import('three').then((THREE) => {
-      const w = mount.clientWidth || 500
-      const h = mount.clientHeight || 700
+      const w = el.clientWidth || 500
+      const h = el.clientHeight || 700
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
       renderer.setSize(w, h)
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-      mount.appendChild(renderer.domElement)
+      el.appendChild(renderer.domElement)
 
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100)
@@ -90,12 +91,11 @@ export default function ThreeAuthBackground({ className }: { className?: string 
       const camPos = { x: 0, y: 0 }
 
       function onMouseMove(e: MouseEvent) {
-        if (!mount) return
-        const rect = mount.getBoundingClientRect()
+        const rect = el.getBoundingClientRect()
         mouse.x = (e.clientX - rect.left) / rect.width - 0.5
         mouse.y = -((e.clientY - rect.top) / rect.height - 0.5)
       }
-      mount.addEventListener('mousemove', onMouseMove)
+      el.addEventListener('mousemove', onMouseMove)
 
       const colorA = new THREE.Color(0x8b5cf6)
       const colorB = new THREE.Color(0x6366f1)
@@ -143,8 +143,8 @@ export default function ThreeAuthBackground({ className }: { className?: string 
       tick()
 
       function onResize() {
-        const nw = mount.clientWidth
-        const nh = mount.clientHeight
+        const nw = el.clientWidth
+        const nh = el.clientHeight
         camera.aspect = nw / nh
         camera.updateProjectionMatrix()
         renderer.setSize(nw, nh)
@@ -154,7 +154,7 @@ export default function ThreeAuthBackground({ className }: { className?: string 
       cleanupRef.current = () => {
         cancelAnimationFrame(animId)
         window.removeEventListener('resize', onResize)
-        mount.removeEventListener('mousemove', onMouseMove)
+        el.removeEventListener('mousemove', onMouseMove)
         ;[geoInner, geoOuter, geoRing1, geoRing2, pGeo].forEach((g) => g.dispose())
         allMats.forEach((m) => m.dispose())
         renderer.dispose()
