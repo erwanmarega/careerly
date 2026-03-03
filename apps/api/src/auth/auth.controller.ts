@@ -6,6 +6,7 @@ import type { Request, Response } from 'express'
 
 import { CurrentUser } from '../common/decorators/current-user.decorator'
 import { AuthService } from './auth.service'
+import { ExchangeCodeDto } from './dto/exchange-code.dto'
 import { ForgotPasswordDto } from './dto/forgot-password.dto'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -63,20 +64,17 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleCallback(@Req() req: Request, @Res() res: Response) {
-    const result = await this.authService.googleLogin(
+    const user = await this.authService.googleLogin(
       req.user as { email: string; name: string; avatar?: string },
     )
-    const { tokens, user } = result
-    const params = new URLSearchParams({
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
-      id: user.id,
-      email: user.email,
-      name: user.name ?? '',
-      plan: user.plan,
-      onboarding_completed: String(user.onboardingCompleted),
-    })
+    const code = await this.authService.generateOAuthCode(user.id)
     const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL')
-    res.redirect(`${frontendUrl}/callback?${params.toString()}`)
+    res.redirect(`${frontendUrl}/callback?code=${code}`)
+  }
+
+  @Post('exchange-code')
+  @HttpCode(HttpStatus.OK)
+  exchangeCode(@Body() dto: ExchangeCodeDto) {
+    return this.authService.exchangeOAuthCode(dto.code)
   }
 }

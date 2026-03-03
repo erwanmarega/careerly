@@ -73,6 +73,31 @@ export class AuthService {
       })
     }
 
+    return user
+  }
+
+  async generateOAuthCode(userId: string): Promise<string> {
+    return this.jwt.signAsync(
+      { sub: userId, type: 'oauth_code' },
+      { secret: this.config.getOrThrow('JWT_SECRET'), expiresIn: '30s' },
+    )
+  }
+
+  async exchangeOAuthCode(code: string) {
+    let payload: { sub: string; type: string }
+    try {
+      payload = await this.jwt.verifyAsync(code, {
+        secret: this.config.getOrThrow('JWT_SECRET'),
+      })
+    } catch {
+      throw new UnauthorizedException('Code invalide ou expiré')
+    }
+
+    if (payload.type !== 'oauth_code') throw new UnauthorizedException('Code invalide')
+
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } })
+    if (!user) throw new UnauthorizedException()
+
     const tokens = await this.generateTokens(user)
     await this.updateRefreshToken(user.id, tokens.refreshToken)
     return { tokens, user: this.sanitize(user) }
