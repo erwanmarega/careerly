@@ -349,6 +349,7 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
     draw()
 
     function onMouseMove(e: MouseEvent) {
+      if (!canvas) return
       const rect = canvas.getBoundingClientRect()
       const x = e.clientX - rect.left
       const i = Math.floor(x / (barW + gapPx))
