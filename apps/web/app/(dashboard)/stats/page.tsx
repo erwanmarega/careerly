@@ -65,6 +65,45 @@ function Skeleton({ className, style }: { className?: string; style?: React.CSSP
   return <div className={`animate-pulse bg-secondary rounded-lg ${className}`} style={style} />
 }
 
+function AnimatedNumber({ value }: { value: string | number }) {
+  const rafRef = useRef<number>()
+  const [display, setDisplay] = useState<string | number>(typeof value === 'number' ? 0 : value)
+
+  useEffect(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+
+    let num: number
+    let prefix = ''
+    let suffix = ''
+
+    if (typeof value === 'number') {
+      num = value
+    } else {
+      const m = value.match(/^([^0-9]*)(\d+(?:\.\d+)?)([^0-9]*)$/)
+      if (!m) { setDisplay(value); return }
+      prefix = m[1]; num = parseFloat(m[2]); suffix = m[3]
+    }
+
+    if (num === 0) { setDisplay(value); return }
+
+    const t0 = performance.now()
+    const dur = 900
+
+    function step(t: number) {
+      const progress = Math.min((t - t0) / dur, 1)
+      const eased = 1 - (1 - progress) ** 3
+      const cur = Math.round(num * eased)
+      setDisplay(typeof value === 'number' ? cur : `${prefix}${cur}${suffix}`)
+      if (progress < 1) rafRef.current = requestAnimationFrame(step)
+    }
+
+    rafRef.current = requestAnimationFrame(step)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [value])
+
+  return <>{display}</>
+}
+
 function KpiCard({
   label,
   value,
@@ -85,7 +124,7 @@ function KpiCard({
       <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center mb-4`}>
         <Icon className={`w-4 h-4 ${color}`} />
       </div>
-      <p className="text-2xl font-bold tracking-tight">{value}</p>
+      <p className="text-2xl font-bold tracking-tight tabular-nums"><AnimatedNumber value={value} /></p>
       <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
       <p className="text-xs text-muted-foreground/60 mt-2">{sub}</p>
     </div>
@@ -214,6 +253,128 @@ function PieChart({ data }: { data: StatusStat[] }) {
 }
 
 function TimelineChart({ data }: { data: TimelineEntry[] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const rafRef = useRef<number>()
+  const hoveredRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || data.length === 0) return
+
+    const ctx = canvas.getContext('2d')!
+    const dpr = Math.min(devicePixelRatio, 2)
+    const W = canvas.offsetWidth
+    const H_CSS = 112
+    canvas.width = W * dpr
+    canvas.height = H_CSS * dpr
+    ctx.scale(dpr, dpr)
+
+    const max = Math.max(...data.map((d) => d.count), 1)
+    const labelH = 20
+    const chartH = H_CSS - labelH
+    const gapPx = data.length > 20 ? 2 : data.length > 10 ? 3 : 5
+    const barW = Math.max((W - gapPx * (data.length - 1)) / data.length, 2)
+    let progress = 0
+
+    function easeOut(t: number) { return 1 - (1 - t) ** 3 }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H_CSS)
+      const p = easeOut(Math.min(progress, 1))
+
+      data.forEach((entry, i) => {
+        const x = i * (barW + gapPx)
+        const bH = Math.max((entry.count / max) * (chartH - 4) * p, entry.count > 0 ? 2 : 0)
+        const y = chartH - bH
+        const isHov = hoveredRef.current === i
+
+        const grad = ctx.createLinearGradient(0, y, 0, chartH)
+        grad.addColorStop(0, isHov ? 'rgba(139,92,246,1)' : 'rgba(139,92,246,0.85)')
+        grad.addColorStop(1, isHov ? 'rgba(139,92,246,0.65)' : 'rgba(139,92,246,0.3)')
+
+        ctx.shadowColor = isHov ? 'rgba(139,92,246,0.55)' : 'transparent'
+        ctx.shadowBlur = isHov ? 12 : 0
+
+        const rad = Math.min(3, barW / 2)
+        ctx.beginPath()
+        ctx.moveTo(x + rad, y)
+        ctx.lineTo(x + barW - rad, y)
+        ctx.quadraticCurveTo(x + barW, y, x + barW, y + rad)
+        ctx.lineTo(x + barW, chartH)
+        ctx.lineTo(x, chartH)
+        ctx.lineTo(x, y + rad)
+        ctx.quadraticCurveTo(x, y, x + rad, y)
+        ctx.closePath()
+        ctx.fillStyle = grad
+        ctx.fill()
+        ctx.shadowBlur = 0
+
+        if (isHov && progress >= 1 && entry.count > 0) {
+          const txt = String(entry.count)
+          ctx.font = 'bold 10px system-ui'
+          const tw = ctx.measureText(txt).width
+          const bx = Math.min(Math.max(x + barW / 2 - tw / 2 - 5, 0), W - tw - 12)
+          const by = Math.max(y - 26, 0)
+          ctx.fillStyle = 'rgba(15,23,42,0.88)'
+          ctx.beginPath()
+          if (ctx.roundRect) ctx.roundRect(bx, by, tw + 10, 18, 4)
+          else ctx.rect(bx, by, tw + 10, 18)
+          ctx.fill()
+          ctx.fillStyle = '#fff'
+          ctx.textAlign = 'left'
+          ctx.fillText(txt, bx + 5, by + 13)
+        }
+      })
+
+      const fmt = (d: string) =>
+        new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      ctx.font = '10px system-ui'
+      ctx.fillStyle = 'rgba(148,163,184,0.8)'
+      ctx.textAlign = 'left'
+      ctx.fillText(fmt(data[0].date), 0, H_CSS)
+      ctx.textAlign = 'right'
+      ctx.fillText(fmt(data[data.length - 1].date), W, H_CSS)
+      if (data.length > 4) {
+        const mid = Math.floor(data.length / 2)
+        ctx.textAlign = 'center'
+        ctx.fillText(fmt(data[mid].date), mid * (barW + gapPx) + barW / 2, H_CSS)
+      }
+
+      if (progress < 1) {
+        progress += 0.03
+        rafRef.current = requestAnimationFrame(draw)
+      }
+    }
+
+    draw()
+
+    function onMouseMove(e: MouseEvent) {
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const i = Math.floor(x / (barW + gapPx))
+      const next = i >= 0 && i < data.length ? i : null
+      if (hoveredRef.current !== next) {
+        hoveredRef.current = next
+        if (progress >= 1) draw()
+      }
+    }
+
+    function onMouseLeave() {
+      if (hoveredRef.current !== null) {
+        hoveredRef.current = null
+        if (progress >= 1) draw()
+      }
+    }
+
+    canvas.addEventListener('mousemove', onMouseMove)
+    canvas.addEventListener('mouseleave', onMouseLeave)
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      canvas.removeEventListener('mousemove', onMouseMove)
+      canvas.removeEventListener('mouseleave', onMouseLeave)
+    }
+  }, [data])
+
   if (data.length === 0) {
     return (
       <div className="h-32 flex items-center justify-center">
@@ -222,47 +383,7 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
     )
   }
 
-  const max = Math.max(...data.map((d) => d.count))
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-end gap-1.5 h-28">
-        {data.map((entry) => (
-          <div
-            key={entry.date}
-            className="flex-1 flex flex-col items-center gap-1 h-full justify-end group relative"
-          >
-            <div
-              className="w-full bg-primary/80 rounded-t-md transition-all duration-500 hover:bg-primary cursor-default min-h-[3px]"
-              style={{ height: `${max > 0 ? (entry.count / max) * 100 : 0}%` }}
-            />
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-foreground text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-              {entry.count}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-between text-xs text-muted-foreground/60 px-0.5">
-        <span>
-          {new Date(data[0].date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-        </span>
-        {data.length > 4 && (
-          <span>
-            {new Date(data[Math.floor(data.length / 2)].date).toLocaleDateString('fr-FR', {
-              day: 'numeric',
-              month: 'short',
-            })}
-          </span>
-        )}
-        <span>
-          {new Date(data[data.length - 1].date).toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'short',
-          })}
-        </span>
-      </div>
-    </div>
-  )
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '112px', display: 'block' }} />
 }
 
 export default function StatsPage() {

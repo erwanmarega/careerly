@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight, Check, Minus } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const ThreeBackground = dynamic(() => import('@/components/ThreeBackground'), { ssr: false })
 
 const mockApplications = [
   {
@@ -75,8 +78,9 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="bg-zinc-950 px-6 sm:px-10 pt-20 pb-0">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative bg-zinc-950 px-6 sm:px-10 pt-20 pb-0">
+        <ThreeBackground className="absolute inset-0 w-full h-full pointer-events-none" />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-12 items-end">
             <div className="pb-20">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-500 mb-8">

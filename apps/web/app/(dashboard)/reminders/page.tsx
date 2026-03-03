@@ -180,7 +180,8 @@ export default function RemindersPage() {
             <div className="flex-1">
               <p className="font-semibold mb-1">Les rappels sont réservés au plan Pro</p>
               <p className="text-sm text-white/70 leading-relaxed mb-4">
-                Ne laissez plus aucune candidature sans relance. Recevez des rappels par email exactement au moment choisi.
+                Ne laissez plus aucune candidature sans relance. Recevez des rappels par email
+                exactement au moment choisi.
               </p>
               <Link
                 href="/settings"
@@ -255,7 +256,7 @@ export default function RemindersPage() {
                     type="datetime-local"
                     required
                     min={minDateTime}
-                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
                   />
                 </div>
               </div>
@@ -264,7 +265,7 @@ export default function RemindersPage() {
                 <input
                   name="message"
                   placeholder="Ex : Relancer pour un retour sur l'entretien…"
-                  className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
                 />
               </div>
               <div className="flex items-center gap-3">
