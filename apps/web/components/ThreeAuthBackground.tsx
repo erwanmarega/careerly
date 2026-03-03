@@ -90,6 +90,7 @@ export default function ThreeAuthBackground({ className }: { className?: string 
       const camPos = { x: 0, y: 0 }
 
       function onMouseMove(e: MouseEvent) {
+        if (!mount) return
         const rect = mount.getBoundingClientRect()
         mouse.x = (e.clientX - rect.left) / rect.width - 0.5
         mouse.y = -((e.clientY - rect.top) / rect.height - 0.5)
