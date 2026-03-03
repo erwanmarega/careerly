@@ -133,9 +133,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-card flex flex-col transform transition-transform duration-250 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden border-r border-border ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ backgroundColor: 'hsl(var(--card))' }}
       >
         <div className="px-5 py-5 border-b border-border flex items-center justify-between">
           <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-lg tracking-tight">
