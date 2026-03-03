@@ -23,8 +23,8 @@ function CallbackContent() {
         '/auth/exchange-code',
         { code },
       )
-      .then(({ tokens, user }) => {
-        setTokens(tokens.accessToken, tokens.refreshToken)
+      .then(async ({ tokens, user }) => {
+        await setTokens(tokens.accessToken, tokens.refreshToken)
         storeUser(user)
         router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding')
       })

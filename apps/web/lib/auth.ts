@@ -14,14 +14,18 @@ interface AuthResponse {
   user: AuthUser
 }
 
-export function setTokens(accessToken: string, refreshToken: string) {
+export async function setTokens(accessToken: string, refreshToken: string) {
   document.cookie = `access_token=${encodeURIComponent(accessToken)}; path=/; max-age=${15 * 60}; SameSite=Lax`
-  document.cookie = `refresh_token=${encodeURIComponent(refreshToken)}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
+  await fetch('/api/auth/session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  })
 }
 
-export function clearTokens() {
+export async function clearTokens() {
   document.cookie = 'access_token=; path=/; max-age=0'
-  document.cookie = 'refresh_token=; path=/; max-age=0'
+  await fetch('/api/auth/session', { method: 'DELETE' })
   localStorage.removeItem('careerly_user')
 }
 
@@ -41,14 +45,14 @@ export function storeUser(user: AuthUser) {
 
 export async function login(email: string, password: string) {
   const data = await api.post<AuthResponse>('/auth/login', { email, password })
-  setTokens(data.tokens.accessToken, data.tokens.refreshToken)
+  await setTokens(data.tokens.accessToken, data.tokens.refreshToken)
   storeUser(data.user)
   return data.user
 }
 
 export async function register(email: string, password: string, name: string) {
   const data = await api.post<AuthResponse>('/auth/register', { email, password, name })
-  setTokens(data.tokens.accessToken, data.tokens.refreshToken)
+  await setTokens(data.tokens.accessToken, data.tokens.refreshToken)
   storeUser(data.user)
   return data.user
 }
@@ -63,6 +67,6 @@ export async function logout() {
   try {
     await api.post('/auth/logout', {})
   } finally {
-    clearTokens()
+    await clearTokens()
   }
 }
