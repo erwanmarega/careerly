@@ -88,7 +88,7 @@ export default function ApplicationDetailPage() {
   const [statusNote, setStatusNote] = useState('')
   const [changingStatus, setChangingStatus] = useState(false)
 
-  const [coverLetter, setCoverLetter] = useState<string | null>(null)
+  const [followUpEmail, setFollowUpEmail] = useState<string | null>(null)
   const [loadingAi, setLoadingAi] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -143,16 +143,16 @@ export default function ApplicationDetailPage() {
     }
   }
 
-  async function handleCoverLetter() {
+  async function handleFollowUpEmail() {
     if (!app) return
     setLoadingAi(true)
-    setCoverLetter(null)
+    setFollowUpEmail(null)
     try {
-      const { text } = await api.post<{ text: string }>('/ai/cover-letter', {
+      const { text } = await api.post<{ text: string }>('/ai/follow-up-email', {
         company: app.company,
         position: app.position,
       })
-      setCoverLetter(text)
+      setFollowUpEmail(text)
     } catch {
     } finally {
       setLoadingAi(false)
@@ -160,8 +160,8 @@ export default function ApplicationDetailPage() {
   }
 
   async function handleCopy() {
-    if (!coverLetter) return
-    await navigator.clipboard.writeText(coverLetter)
+    if (!followUpEmail) return
+    await navigator.clipboard.writeText(followUpEmail)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -621,7 +621,7 @@ export default function ApplicationDetailPage() {
             </div>
 
             <button
-              onClick={handleCoverLetter}
+              onClick={handleFollowUpEmail}
               disabled={loadingAi}
               className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white text-xs font-semibold px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
@@ -629,7 +629,7 @@ export default function ApplicationDetailPage() {
               {loadingAi ? 'Génération en cours…' : 'Générer un email de relance'}
             </button>
 
-            {coverLetter && (
+            {followUpEmail && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">Résultat</p>
@@ -642,7 +642,7 @@ export default function ApplicationDetailPage() {
                   </button>
                 </div>
                 <div className="bg-secondary rounded-xl p-4 text-xs text-foreground whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto">
-                  {coverLetter}
+                  {followUpEmail}
                 </div>
               </div>
             )}

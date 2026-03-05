@@ -5,14 +5,14 @@ import { Injectable } from '@nestjs/common'
 export class AiService {
   private client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-  async generateCoverLetter(company: string, position: string, userName: string) {
+  async generateFollowUpEmail(company: string, position: string, userName: string) {
     const message = await this.client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 512,
       messages: [
         {
           role: 'user',
-          content: `Génère une lettre de relance pour ${userName} qui a postulé pour le poste de ${position} chez ${company}. La lettre doit être professionnelle et concise.`,
+          content: `Génère un email de relance court et professionnel pour ${userName} qui a postulé au poste de ${position} chez ${company} et n'a pas eu de réponse. L'email doit : avoir un objet (préfixé par "Objet :"), faire 4-6 lignes maximum, être direct et chaleureux, se terminer par une signature avec le prénom uniquement. Ne pas ajouter d'explications, retourner uniquement l'email.`,
         },
       ],
     })

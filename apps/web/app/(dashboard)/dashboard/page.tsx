@@ -384,7 +384,7 @@ export default function DashboardPage() {
                 Candidatures illimitées, rappels, stats avancées et export PDF.
               </p>
               <Link
-                href="/settings"
+                href="/settings#abonnement"
                 className="inline-flex items-center gap-1.5 bg-white text-primary text-xs font-semibold px-3 py-2 rounded-lg hover:bg-white/90 transition-colors"
               >
                 Voir les offres <ArrowRight className="w-3 h-3" />

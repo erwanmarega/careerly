@@ -459,7 +459,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
+      <div id="abonnement" className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm">Abonnement</h2>
           <span
