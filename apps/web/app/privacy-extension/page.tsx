@@ -33,7 +33,7 @@ export default function PrivacyExtensionPage() {
       <p className="text-muted-foreground text-sm">L&apos;extension est active uniquement sur : LinkedIn, Indeed, Welcome to the Jungle, JobTeaser, HelloWork.</p>
 
       <h2 className="text-base font-bold mt-8 mb-2">6. Contact</h2>
-      <p className="text-muted-foreground text-sm">Pour toute question : <a href="mailto:contact@careerly.app" className="text-primary hover:underline">contact@careerly.app</a></p>
+      <p className="text-muted-foreground text-sm">Pour toute question : <a href="mailto:maregaerwan@gmail.com" className="text-primary hover:underline">maregaerwan@gmail.com</a></p>
     </main>
   )
 }
