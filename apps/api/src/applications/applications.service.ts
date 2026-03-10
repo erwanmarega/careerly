@@ -85,8 +85,154 @@ export class ApplicationsService {
     return application
   }
 
+  async exportCsv(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } })
+    if (user.plan === Plan.FREE) throw new ForbiddenException('CSV export requires a Pro plan')
+
+    const applications = await this.prisma.application.findMany({
+      where: { userId },
+      orderBy: { appliedAt: 'desc' },
+    })
+
+    const escape = (v: string | null | undefined) => {
+      if (v == null) return ''
+      const s = String(v)
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+    }
+
+    const header = ['Company', 'Position', 'Location', 'Status', 'Applied At', 'Salary', 'URL', 'Notes']
+    const rows = applications.map((a) => [
+      escape(a.company),
+      escape(a.position),
+      escape(a.location),
+      escape(a.status),
+      escape(a.appliedAt.toISOString().split('T')[0]),
+      escape(a.salary),
+      escape(a.url),
+      escape(a.notes),
+    ])
+
+    return [header.join(','), ...rows.map((r) => r.join(','))].join('\n')
+  }
+
   async delete(id: string, userId: string) {
     await this.findOne(id, userId)
     await this.prisma.application.delete({ where: { id } })
+  }
+
+  async importFromCsv(userId: string, csvText: string, columnMapping?: Record<string, string>) {
+    const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter((l) => l.trim())
+    if (lines.length < 2) return { imported: 0, skipped: 0 }
+
+    const rawHeaders = this.parseCsvRow(lines[0]).map((h) => h.trim())
+    const headersLower = rawHeaders.map((h) => h.toLowerCase())
+
+    let cols: { company: number; position: number; location: number; url: number; salary: number; status: number; appliedAt: number; notes: number }
+
+    if (columnMapping && Object.keys(columnMapping).length > 0) {
+      const colByName = (name?: string): number => {
+        if (!name) return -1
+        const exact = rawHeaders.indexOf(name)
+        if (exact !== -1) return exact
+        return headersLower.indexOf(name.toLowerCase())
+      }
+      cols = {
+        company: colByName(columnMapping.company),
+        position: colByName(columnMapping.position),
+        location: colByName(columnMapping.location),
+        url: colByName(columnMapping.url),
+        salary: colByName(columnMapping.salary),
+        status: colByName(columnMapping.status),
+        appliedAt: colByName(columnMapping.appliedAt),
+        notes: colByName(columnMapping.notes),
+      }
+    } else {
+      const col = (aliases: string[]) => {
+        for (const a of aliases) {
+          const idx = headersLower.indexOf(a)
+          if (idx !== -1) return idx
+        }
+        return -1
+      }
+      cols = {
+        company: col(['company', 'entreprise', 'société', 'societe']),
+        position: col(['position', 'poste', 'intitulé', 'intitule', 'titre']),
+        location: col(['location', 'lieu', 'ville', 'localisation']),
+        url: col(['url', 'lien', 'link']),
+        salary: col(['salary', 'salaire']),
+        status: col(['status', 'statut']),
+        appliedAt: col(['appliedat', 'date', 'date de candidature', 'date_candidature']),
+        notes: col(['notes', 'note', 'commentaire', 'commentaires']),
+      }
+    }
+
+    const statusMap: Record<string, ApplicationStatus> = {
+      envoyee: ApplicationStatus.SENT, envoyée: ApplicationStatus.SENT, sent: ApplicationStatus.SENT,
+      relancer: ApplicationStatus.FOLLOW_UP, 'à relancer': ApplicationStatus.FOLLOW_UP, follow_up: ApplicationStatus.FOLLOW_UP, follow: ApplicationStatus.FOLLOW_UP,
+      entretien: ApplicationStatus.INTERVIEW, interview: ApplicationStatus.INTERVIEW,
+      offre: ApplicationStatus.OFFER, offer: ApplicationStatus.OFFER,
+      refuse: ApplicationStatus.REJECTED, refusé: ApplicationStatus.REJECTED, rejected: ApplicationStatus.REJECTED,
+      archivee: ApplicationStatus.ARCHIVED, archivée: ApplicationStatus.ARCHIVED, archived: ApplicationStatus.ARCHIVED,
+    }
+
+    const rows = lines.slice(1).map((l) => this.parseCsvRow(l))
+    const toCreate: { userId: string; company: string; position: string; location?: string; url?: string; salary?: string; status: ApplicationStatus; appliedAt: Date; notes?: string }[] = []
+
+    let skipped = 0
+
+    for (const row of rows) {
+      const get = (idx: number) => (idx !== -1 ? (row[idx] ?? '').trim() : '')
+      const company = get(cols.company)
+      const position = get(cols.position)
+      if (!company || !position) { skipped++; continue }
+
+      const rawStatus = get(cols.status).toLowerCase()
+      const status = statusMap[rawStatus] ?? ApplicationStatus.SENT
+
+      const rawDate = get(cols.appliedAt)
+      const appliedAt = rawDate ? new Date(rawDate) : new Date()
+      if (isNaN(appliedAt.getTime())) { skipped++; continue }
+
+      const rawUrl = get(cols.url)
+
+      toCreate.push({
+        userId,
+        company,
+        position,
+        location: get(cols.location) || undefined,
+        url: rawUrl || undefined,
+        salary: get(cols.salary) || undefined,
+        status,
+        appliedAt,
+        notes: get(cols.notes) || undefined,
+      })
+    }
+
+    if (toCreate.length > 0) {
+      await this.prisma.application.createMany({ data: toCreate })
+    }
+
+    return { imported: toCreate.length, skipped }
+  }
+
+  private parseCsvRow(line: string): string[] {
+    const result: string[] = []
+    let current = ''
+    let inQuotes = false
+
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i]
+      if (ch === '"') {
+        if (inQuotes && line[i + 1] === '"') { current += '"'; i++ }
+        else inQuotes = !inQuotes
+      } else if (ch === ',' && !inQuotes) {
+        result.push(current)
+        current = ''
+      } else {
+        current += ch
+      }
+    }
+    result.push(current)
+    return result
   }
 }

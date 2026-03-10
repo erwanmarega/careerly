@@ -2,11 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bell, Plus, Send, CalendarCheck, Trophy, TrendingUp, RefreshCw } from 'lucide-react'
+import {
+  ArrowRight,
+  Bell,
+  Plus,
+  Send,
+  CalendarCheck,
+  Trophy,
+  TrendingUp,
+  RefreshCw,
+} from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 import { useStats } from '@/hooks/useStats'
 import { useApplications } from '@/hooks/useApplications'
-import { fetchApplications, STATUS_LABELS, STATUS_STYLES, type Application } from '@/lib/applications'
+import {
+  fetchApplications,
+  STATUS_LABELS,
+  STATUS_STYLES,
+  type Application,
+} from '@/lib/applications'
 import { api } from '@/lib/api'
 
 interface Reminder {
@@ -46,13 +60,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchApplications({ status: 'FOLLOW_UP', limit: 4 })
-      .then((res) => { setFollowUp(res.data); setFollowUpTotal(res.total) })
+      .then((res) => {
+        setFollowUp(res.data)
+        setFollowUpTotal(res.total)
+      })
       .catch(() => {})
       .finally(() => setFollowUpLoading(false))
   }, [])
 
   useEffect(() => {
-    api.get<Reminder[]>('/reminders')
+    api
+      .get<Reminder[]>('/reminders')
       .then(setReminders)
       .catch(() => {})
       .finally(() => setRemindersLoading(false))
@@ -79,7 +97,7 @@ export default function DashboardPage() {
       sub: `${stats?.activeApplications ?? 0} actives`,
       icon: Send,
       color: 'text-blue-500',
-      bg: 'bg-blue-50',
+      bg: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       label: 'Taux de réponse',
@@ -87,7 +105,7 @@ export default function DashboardPage() {
       sub: 'des candidatures',
       icon: TrendingUp,
       color: 'text-emerald-500',
-      bg: 'bg-emerald-50',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
       label: 'Entretiens',
@@ -95,15 +113,15 @@ export default function DashboardPage() {
       sub: 'des candidatures',
       icon: CalendarCheck,
       color: 'text-violet-500',
-      bg: 'bg-violet-50',
+      bg: 'bg-violet-50 dark:bg-violet-950/30',
     },
     {
       label: 'Offres',
       value: `${stats?.offerRate ?? 0}%`,
-      sub: 'taux d\'offre',
+      sub: "taux d'offre",
       icon: Trophy,
       color: 'text-amber-500',
-      bg: 'bg-amber-50',
+      bg: 'bg-amber-50 dark:bg-amber-950/30',
     },
   ]
 
@@ -116,7 +134,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -142,7 +159,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl border border-border p-5">
+          <div key={s.label} className="bg-card rounded-2xl border border-border p-5">
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-4`}>
               <s.icon className={`w-4 h-4 ${s.color}`} />
             </div>
@@ -158,8 +175,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="lg:col-span-2 bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-sm">Candidatures récentes</h2>
@@ -190,7 +206,9 @@ export default function DashboardPage() {
             </div>
           ) : applications.length === 0 ? (
             <div className="px-6 py-16 text-center">
-              <p className="text-sm text-muted-foreground">Aucune candidature pour l&apos;instant.</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune candidature pour l&apos;instant.
+              </p>
               <Link
                 href="/applications/new"
                 className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline underline-offset-4"
@@ -235,8 +253,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-4">
-
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-3.5 h-3.5 text-blue-500" />
@@ -296,7 +313,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Bell className="w-3.5 h-3.5 text-amber-500" />
@@ -341,7 +358,9 @@ export default function DashboardPage() {
                         <p className="text-xs text-muted-foreground truncate">
                           {r.application.company} · {r.application.position}
                         </p>
-                        <p className={`text-xs mt-0.5 ${overdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                        <p
+                          className={`text-xs mt-0.5 ${overdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}
+                        >
                           {overdue ? 'En retard · ' : ''}
                           {new Date(r.scheduledAt).toLocaleDateString('fr-FR', {
                             day: 'numeric',
@@ -365,7 +384,7 @@ export default function DashboardPage() {
                 Candidatures illimitées, rappels, stats avancées et export PDF.
               </p>
               <Link
-                href="/settings"
+                href="/settings#abonnement"
                 className="inline-flex items-center gap-1.5 bg-white text-primary text-xs font-semibold px-3 py-2 rounded-lg hover:bg-white/90 transition-colors"
               >
                 Voir les offres <ArrowRight className="w-3 h-3" />

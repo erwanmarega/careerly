@@ -1,25 +1,26 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useRef, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Camera, CheckCircle2, Crown, Loader2, Sparkles, X, Zap } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
 import { useUser } from '@/hooks/useUser'
 import { clearTokens, storeUser, type AuthUser } from '@/lib/auth'
 
 const inputCls =
-  'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all'
+  'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card'
 
 const PLAN_LABELS: Record<string, string> = {
   FREE: 'Gratuit',
   PRO: 'Pro',
-  PREMIUM: 'Premium',
 }
 
 const PLAN_STYLES: Record<string, string> = {
   FREE: 'bg-secondary text-muted-foreground',
   PRO: 'bg-blue-100 text-blue-700',
-  PREMIUM: 'bg-violet-100 text-violet-700',
 }
 
 function AvatarUpload({
@@ -78,6 +79,7 @@ function AvatarUpload({
         name: updated.name,
         plan: updated.plan,
         avatar: updated.avatar ?? null,
+        onboardingCompleted: true,
       })
       onUploaded(updated.avatar ?? objectUrl)
     } catch (err) {
@@ -150,9 +152,9 @@ function AvatarUpload({
 }
 
 export default function SettingsPage() {
-  const { user, loading } = useUser()
+  const { user, loading, refresh } = useUser()
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const { theme, setTheme } = useTheme()
 
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
@@ -173,8 +175,17 @@ export default function SettingsPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  const stripeSuccess = searchParams.get('success') === 'true'
-  const stripeCanceled = searchParams.get('canceled') === 'true'
+  const [stripeSuccess, setStripeSuccess] = useState(false)
+  const [stripeCanceled, setStripeCanceled] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const success = params.get('success') === 'true'
+    const canceled = params.get('canceled') === 'true'
+    setStripeSuccess(success)
+    setStripeCanceled(canceled)
+    if (success) refresh()
+  }, [])
 
   const initialized = useRef(false)
   useEffect(() => {
@@ -215,6 +226,7 @@ export default function SettingsPage() {
         name: updated.name,
         plan: updated.plan,
         avatar: avatar,
+        onboardingCompleted: true,
       })
       setProfileSuccess(true)
       setTimeout(() => setProfileSuccess(false), 3000)
@@ -290,7 +302,7 @@ export default function SettingsPage() {
   }
 
   const plan = user?.plan ?? 'FREE'
-  const isPaid = plan === 'PRO' || plan === 'PREMIUM'
+  const isPaid = plan === 'PRO'
 
   if (loading) {
     return (
@@ -298,7 +310,7 @@ export default function SettingsPage() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="bg-white rounded-2xl border border-border p-6 space-y-4 animate-pulse"
+            className="bg-card rounded-2xl border border-border p-6 space-y-4 animate-pulse"
           >
             <div className="h-4 bg-secondary rounded w-32" />
             <div className="h-10 bg-secondary rounded-xl" />
@@ -330,7 +342,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <h2 className="font-semibold text-sm">Profil</h2>
 
         <AvatarUpload currentAvatar={avatar} name={name} onUploaded={(url) => setAvatar(url)} />
@@ -382,7 +394,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <h2 className="font-semibold text-sm">Mot de passe</h2>
 
         {passwordError && (
@@ -447,7 +459,7 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6 space-y-5">
+      <div id="abonnement" className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm">Abonnement</h2>
           <span
@@ -477,79 +489,47 @@ export default function SettingsPage() {
               Passez à un plan payant pour accéder aux rappels, aux statistiques avancées et plus
               encore.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="border border-border rounded-2xl p-5 space-y-4 hover:border-blue-300 transition-colors">
+            <div className="max-w-sm">
+              <div className="border-2 border-primary rounded-2xl p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-blue-500" />
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold">Pro</p>
-                    <p className="text-xs text-muted-foreground">9€ / mois</p>
+                    <p className="text-xs text-muted-foreground">8€ / mois</p>
                   </div>
                 </div>
                 <ul className="space-y-1.5 text-xs text-muted-foreground">
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Candidatures illimitées
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Rappels par email
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                     Statistiques avancées
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    Export CSV &amp; PDF
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    Assistant IA (bientôt)
                   </li>
                 </ul>
                 <button
                   onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!)}
                   disabled={checkoutLoading !== null}
-                  className="w-full py-2 text-xs font-semibold bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full py-2 text-xs font-semibold bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {checkoutLoading === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
                     ? 'Chargement…'
                     : 'Passer en Pro'}
-                </button>
-              </div>
-
-              <div className="border border-violet-200 rounded-2xl p-5 space-y-4 bg-gradient-to-b from-violet-50/50 to-white hover:border-violet-400 transition-colors">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-violet-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold">Premium</p>
-                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">
-                        Populaire
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">19€ / mois</p>
-                  </div>
-                </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Tout le plan Pro
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Export PDF
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" />
-                    Fonctionnalités IA (bientôt)
-                  </li>
-                </ul>
-                <button
-                  onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID!)}
-                  disabled={checkoutLoading !== null}
-                  className="w-full py-2 text-xs font-semibold bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {checkoutLoading === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID
-                    ? 'Chargement…'
-                    : 'Passer en Premium'}
                 </button>
               </div>
             </div>
@@ -557,7 +537,46 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-red-200 p-6 space-y-4">
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+        <h2 className="font-semibold text-sm">Apparence</h2>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setTheme('light')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'light'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Sun className="w-4 h-4" />
+            Clair
+          </button>
+          <button
+            onClick={() => setTheme('dark')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'dark'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Moon className="w-4 h-4" />
+            Sombre
+          </button>
+          <button
+            onClick={() => setTheme('system')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'system'
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-border hover:bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            Système
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-card rounded-2xl border border-red-200 p-6 space-y-4">
         <h2 className="font-semibold text-sm text-red-600">Zone dangereuse</h2>
         <p className="text-sm text-muted-foreground">
           La suppression de votre compte est définitive. Toutes vos données seront effacées.

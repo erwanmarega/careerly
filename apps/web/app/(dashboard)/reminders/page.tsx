@@ -37,7 +37,7 @@ function ReminderCard({
   const isOverdue = !reminder.sent && date < new Date()
 
   return (
-    <div className="bg-white rounded-2xl border border-border px-5 py-4 flex items-center gap-4">
+    <div className="bg-card rounded-2xl border border-border px-5 py-4 flex items-center gap-4">
       <div
         className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
           reminder.sent ? 'bg-emerald-50' : isOverdue ? 'bg-red-50' : 'bg-primary/10'
@@ -180,7 +180,8 @@ export default function RemindersPage() {
             <div className="flex-1">
               <p className="font-semibold mb-1">Les rappels sont réservés au plan Pro</p>
               <p className="text-sm text-white/70 leading-relaxed mb-4">
-                Ne laissez plus aucune candidature sans relance. Recevez des rappels par email exactement au moment choisi.
+                Ne laissez plus aucune candidature sans relance. Recevez des rappels par email
+                exactement au moment choisi.
               </p>
               <Link
                 href="/settings"
@@ -194,7 +195,7 @@ export default function RemindersPage() {
       )}
 
       {showForm && !isFree && (
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-semibold text-sm">Nouveau rappel</h2>
             <button
@@ -236,7 +237,7 @@ export default function RemindersPage() {
                   <select
                     name="applicationId"
                     required
-                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-white"
+                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
                   >
                     <option value="">Sélectionner…</option>
                     {applications.map((app) => (
@@ -255,7 +256,7 @@ export default function RemindersPage() {
                     type="datetime-local"
                     required
                     min={minDateTime}
-                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
                   />
                 </div>
               </div>
@@ -264,7 +265,7 @@ export default function RemindersPage() {
                 <input
                   name="message"
                   placeholder="Ex : Relancer pour un retour sur l'entretien…"
-                  className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -298,7 +299,7 @@ export default function RemindersPage() {
           ))}
         </div>
       ) : reminders.length === 0 && !isFree ? (
-        <div className="bg-white rounded-2xl border border-border px-6 py-16 text-center">
+        <div className="bg-card rounded-2xl border border-border px-6 py-16 text-center">
           <CalendarClock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">Aucun rappel pour le moment.</p>
           <button

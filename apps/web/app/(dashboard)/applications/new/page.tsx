@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
 import { createApplication, ALL_STATUSES } from '@/lib/applications'
 
@@ -70,14 +71,19 @@ export default function NewApplicationPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-sm">Informations principales</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
                 Entreprise <span className="text-red-500">*</span>
               </label>
-              <input name="company" required placeholder="Google, Airbnb…" className={inputCls} />
+              <input
+                name="company"
+                required
+                placeholder="Google, Airbnb…"
+                className={cn(inputCls, 'bg-card')}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
@@ -87,7 +93,7 @@ export default function NewApplicationPage() {
                 name="position"
                 required
                 placeholder="Développeur Full Stack…"
-                className={inputCls}
+                className={cn(inputCls, 'bg-card')}
               />
             </div>
           </div>
@@ -95,7 +101,7 @@ export default function NewApplicationPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Statut</label>
-              <select name="status" defaultValue="SENT" className={`${inputCls} bg-white`}>
+              <select name="status" defaultValue="SENT" className={cn(inputCls, 'bg-card')}>
                 {ALL_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
                     {s.label}
@@ -105,45 +111,62 @@ export default function NewApplicationPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Date de candidature</label>
-              <input name="appliedAt" type="date" defaultValue={today} className={inputCls} />
+              <input
+                name="appliedAt"
+                type="date"
+                defaultValue={today}
+                className={cn(inputCls, 'bg-card')}
+              />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-sm">Détails</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Lieu</label>
-              <input name="location" placeholder="Paris, Remote…" className={inputCls} />
+              <input
+                name="location"
+                placeholder="Paris, Remote…"
+                className={cn(inputCls, 'bg-card')}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Salaire</label>
-              <input name="salary" placeholder="45k€, 50-60k€…" className={inputCls} />
+              <input
+                name="salary"
+                placeholder="45k€, 50-60k€…"
+                className={cn(inputCls, 'bg-card')}
+              />
             </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium">URL de l&apos;offre</label>
-            <input name="url" placeholder="https://…" className={inputCls} />
+            <input name="url" placeholder="https://…" className={cn(inputCls, 'bg-card')} />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-sm">Notes</h2>
           <textarea
             name="notes"
             rows={4}
             placeholder="Informations importantes, impressions, préparation…"
-            className={`${inputCls} resize-none`}
+            className={cn(inputCls, 'bg-card', 'resize-none')}
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-sm">Contact</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Nom du contact</label>
-              <input name="contactName" placeholder="Jean Dupont" className={inputCls} />
+              <input
+                name="contactName"
+                placeholder="Jean Dupont"
+                className={cn(inputCls, 'bg-card')}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Email du contact</label>
@@ -151,7 +174,7 @@ export default function NewApplicationPage() {
                 name="contactEmail"
                 type="email"
                 placeholder="rh@entreprise.com"
-                className={inputCls}
+                className={cn(inputCls, 'bg-card')}
               />
             </div>
           </div>
@@ -165,7 +188,10 @@ export default function NewApplicationPage() {
           >
             {loading ? 'Enregistrement…' : 'Enregistrer'}
           </button>
-          <Link href="/applications" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/applications"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Annuler
           </Link>
         </div>

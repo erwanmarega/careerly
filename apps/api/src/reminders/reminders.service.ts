@@ -28,7 +28,7 @@ export class RemindersService {
   async findAll(userId: string) {
     return this.prisma.reminder.findMany({
       where: { userId },
-      include: { application: { select: { company: true, position: true } } },
+      include: { application: { select: { id: true, company: true, position: true, status: true } } },
       orderBy: { scheduledAt: 'asc' },
     })
   }
@@ -47,10 +47,8 @@ export class RemindersService {
       data: { ...dto, userId, scheduledAt: new Date(dto.scheduledAt) },
     })
 
-    const delay = new Date(dto.scheduledAt).getTime() - Date.now()
-    if (delay > 0) {
-      await this.remindersQueue.add('send-reminder', { reminderId: reminder.id }, { delay })
-    }
+    const delay = Math.max(0, new Date(dto.scheduledAt).getTime() - Date.now())
+    await this.remindersQueue.add('send-reminder', { reminderId: reminder.id }, { delay, attempts: 3 })
 
     return reminder
   }

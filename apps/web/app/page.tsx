@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight, Check, Minus } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const ThreeBackground = dynamic(() => import('@/components/ThreeBackground'), { ssr: false })
 
 const mockApplications = [
   {
@@ -50,7 +53,7 @@ const comparison = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <header className="px-6 sm:px-10 py-5 flex items-center justify-between max-w-6xl mx-auto">
         <span className="font-black text-xl tracking-tight">Careerly</span>
         <div className="flex items-center gap-6">
@@ -75,14 +78,15 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="bg-zinc-950 px-6 sm:px-10 pt-20 pb-0">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative bg-zinc-950 px-6 sm:px-10 pt-20 pb-0">
+        <ThreeBackground className="absolute inset-0 w-full h-full pointer-events-none" />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-12 items-end">
             <div className="pb-20">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-500 mb-8">
                 Gestion de candidatures
               </p>
-              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black leading-[0.88] tracking-tighter text-white mb-8">
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl leading-[0.88] tracking-tighter text-white mb-8">
                 Vous postulez.
                 <br />
                 <span className="text-primary">On s'occupe</span>
@@ -96,7 +100,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 bg-primary text-white font-bold px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+                  className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
                 >
                   Essayer gratuitement
                   <ArrowRight className="w-4 h-4" />
@@ -295,7 +299,7 @@ export default function LandingPage() {
           <p className="text-muted-foreground mb-12 text-sm">
             Commencez gratuit, passez Pro si vous en avez besoin.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             <div className="border border-border rounded-2xl p-7">
               <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-6">
                 Free
@@ -331,9 +335,10 @@ export default function LandingPage() {
                 {[
                   'Candidatures illimitées',
                   'Rappels de relance',
-                  'Statistiques',
-                  'Export PDF',
+                  'Statistiques avancées',
+                  'Export CSV & PDF',
                   'Historique des statuts',
+                  'Assistant IA (bientôt)',
                 ].map((f) => (
                   <li key={f} className="text-sm flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -348,40 +353,13 @@ export default function LandingPage() {
                 Passer en Pro
               </Link>
             </div>
-
-            <div className="border border-border rounded-2xl p-7 bg-zinc-950 text-white">
-              <div className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-6">
-                Premium
-              </div>
-              <div className="text-5xl font-black mb-1">14€</div>
-              <p className="text-sm text-zinc-500 mb-8">par mois</p>
-              <ul className="space-y-2.5 mb-8">
-                {[
-                  'Tout le plan Pro',
-                  'Assistant IA',
-                  'Lettres de motivation',
-                  'Support prioritaire',
-                ].map((f) => (
-                  <li key={f} className="text-sm flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-zinc-600 flex-shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/register?plan=premium"
-                className="block text-center text-sm font-bold bg-white text-zinc-950 rounded-xl py-3 hover:bg-zinc-100 transition-colors"
-              >
-                Passer en Premium
-              </Link>
-            </div>
           </div>
         </div>
       </section>
 
       <section className="bg-zinc-950 border-t-4 border-foreground">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-24">
-          <h2 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.88] tracking-tighter mb-12 max-w-4xl">
+          <h2 className="text-5xl sm:text-6xl lg:text-8xl text-white leading-[0.88] tracking-tighter mb-12 max-w-4xl">
             Votre prochaine
             <br />
             <span className="text-primary">candidature</span>

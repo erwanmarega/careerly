@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 
+import { MailModule } from '../mail/mail.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy'
@@ -11,6 +12,7 @@ import { GoogleStrategy } from './strategies/google.strategy'
 
 @Module({
   imports: [
+    MailModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

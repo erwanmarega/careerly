@@ -1,7 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send, TrendingUp, CalendarCheck, Trophy, BarChart2, PieChart as PieChartIcon } from 'lucide-react'
+import {
+  Send,
+  TrendingUp,
+  CalendarCheck,
+  Trophy,
+  BarChart2,
+  PieChart as PieChartIcon,
+  Clock,
+  Activity,
+} from 'lucide-react'
 import { api } from '@/lib/api'
 import { STATUS_LABELS } from '@/lib/applications'
 
@@ -11,6 +20,9 @@ interface StatsOverview {
   interviewRate: number
   offerRate: number
   activeApplications: number
+  avgResponseDays: number | null
+  thisWeekCount: number
+  lastWeekCount: number
 }
 
 interface StatusStat {
@@ -42,8 +54,54 @@ const STATUS_PIE_COLORS: Record<string, string> = {
   ARCHIVED: '#cbd5e1',
 }
 
+const PERIODS = [
+  { value: '7d', label: '7 jours' },
+  { value: '30d', label: '30 jours' },
+  { value: '90d', label: '3 mois' },
+  { value: 'all', label: 'Tout' },
+]
+
 function Skeleton({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return <div className={`animate-pulse bg-secondary rounded-lg ${className}`} style={style} />
+}
+
+function AnimatedNumber({ value }: { value: string | number }) {
+  const rafRef = useRef<number>()
+  const [display, setDisplay] = useState<string | number>(typeof value === 'number' ? 0 : value)
+
+  useEffect(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+
+    let num: number
+    let prefix = ''
+    let suffix = ''
+
+    if (typeof value === 'number') {
+      num = value
+    } else {
+      const m = value.match(/^([^0-9]*)(\d+(?:\.\d+)?)([^0-9]*)$/)
+      if (!m) { setDisplay(value); return }
+      prefix = m[1]; num = parseFloat(m[2]); suffix = m[3]
+    }
+
+    if (num === 0) { setDisplay(value); return }
+
+    const t0 = performance.now()
+    const dur = 900
+
+    function step(t: number) {
+      const progress = Math.min((t - t0) / dur, 1)
+      const eased = 1 - (1 - progress) ** 3
+      const cur = Math.round(num * eased)
+      setDisplay(typeof value === 'number' ? cur : `${prefix}${cur}${suffix}`)
+      if (progress < 1) rafRef.current = requestAnimationFrame(step)
+    }
+
+    rafRef.current = requestAnimationFrame(step)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [value])
+
+  return <>{display}</>
 }
 
 function KpiCard({
@@ -62,11 +120,11 @@ function KpiCard({
   bg: string
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-border p-5">
+    <div className="bg-card rounded-2xl border border-border p-5">
       <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center mb-4`}>
         <Icon className={`w-4 h-4 ${color}`} />
       </div>
-      <p className="text-2xl font-bold tracking-tight">{value}</p>
+      <p className="text-2xl font-bold tracking-tight tabular-nums"><AnimatedNumber value={value} /></p>
       <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
       <p className="text-xs text-muted-foreground/60 mt-2">{sub}</p>
     </div>
@@ -137,7 +195,9 @@ function PieChart({ data }: { data: StatusStat[] }) {
             style={{
               transformOrigin: `${cx}px ${cy}px`,
               ...(ready
-                ? { animation: `pie-slice-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 75}ms both` }
+                ? {
+                    animation: `pie-slice-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 75}ms both`,
+                  }
                 : { transform: 'scale(0)', opacity: 0 }),
             }}
           >
@@ -156,39 +216,166 @@ function PieChart({ data }: { data: StatusStat[] }) {
       </svg>
 
       <div className="space-y-2.5 flex-1 min-w-0">
-        {[...slices].sort((a, b) => b.count - a.count).map((slice, i) => (
-          <div
-            key={`${slice.status}-legend-${animKey.current}`}
-            className="flex items-center gap-2"
-            onMouseEnter={() => setHovered(slice.status)}
-            onMouseLeave={() => setHovered(null)}
-            style={
-              ready
-                ? { animation: `pie-legend-in 0.35s ease-out ${i * 60 + 150}ms both` }
-                : { opacity: 0 }
-            }
-          >
+        {[...slices]
+          .sort((a, b) => b.count - a.count)
+          .map((slice, i) => (
             <div
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-150"
-              style={{
-                backgroundColor: STATUS_PIE_COLORS[slice.status] ?? '#6366f1',
-                transform: hovered === slice.status ? 'scale(1.5)' : 'scale(1)',
-              }}
-            />
-            <span className={`text-xs truncate transition-all duration-150 ${hovered === slice.status ? 'font-medium' : ''}`}>
-              {STATUS_LABELS[slice.status] ?? slice.status}
-            </span>
-            <span className="text-xs text-muted-foreground tabular-nums ml-auto flex-shrink-0">
-              {slice.count} · {slice.percentage}%
-            </span>
-          </div>
-        ))}
+              key={`${slice.status}-legend-${animKey.current}`}
+              className="flex items-center gap-2"
+              onMouseEnter={() => setHovered(slice.status)}
+              onMouseLeave={() => setHovered(null)}
+              style={
+                ready
+                  ? { animation: `pie-legend-in 0.35s ease-out ${i * 60 + 150}ms both` }
+                  : { opacity: 0 }
+              }
+            >
+              <div
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-150"
+                style={{
+                  backgroundColor: STATUS_PIE_COLORS[slice.status] ?? '#6366f1',
+                  transform: hovered === slice.status ? 'scale(1.5)' : 'scale(1)',
+                }}
+              />
+              <span
+                className={`text-xs truncate transition-all duration-150 ${hovered === slice.status ? 'font-medium' : ''}`}
+              >
+                {STATUS_LABELS[slice.status] ?? slice.status}
+              </span>
+              <span className="text-xs text-muted-foreground tabular-nums ml-auto flex-shrink-0">
+                {slice.count} · {slice.percentage}%
+              </span>
+            </div>
+          ))}
       </div>
     </div>
   )
 }
 
 function TimelineChart({ data }: { data: TimelineEntry[] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const rafRef = useRef<number>()
+  const hoveredRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || data.length === 0) return
+
+    const ctx = canvas.getContext('2d')!
+    const dpr = Math.min(devicePixelRatio, 2)
+    const W = canvas.offsetWidth
+    const H_CSS = 112
+    canvas.width = W * dpr
+    canvas.height = H_CSS * dpr
+    ctx.scale(dpr, dpr)
+
+    const max = Math.max(...data.map((d) => d.count), 1)
+    const labelH = 20
+    const chartH = H_CSS - labelH
+    const gapPx = data.length > 20 ? 2 : data.length > 10 ? 3 : 5
+    const barW = Math.max((W - gapPx * (data.length - 1)) / data.length, 2)
+    let progress = 0
+
+    function easeOut(t: number) { return 1 - (1 - t) ** 3 }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H_CSS)
+      const p = easeOut(Math.min(progress, 1))
+
+      data.forEach((entry, i) => {
+        const x = i * (barW + gapPx)
+        const bH = Math.max((entry.count / max) * (chartH - 4) * p, entry.count > 0 ? 2 : 0)
+        const y = chartH - bH
+        const isHov = hoveredRef.current === i
+
+        const grad = ctx.createLinearGradient(0, y, 0, chartH)
+        grad.addColorStop(0, isHov ? 'rgba(139,92,246,1)' : 'rgba(139,92,246,0.85)')
+        grad.addColorStop(1, isHov ? 'rgba(139,92,246,0.65)' : 'rgba(139,92,246,0.3)')
+
+        ctx.shadowColor = isHov ? 'rgba(139,92,246,0.55)' : 'transparent'
+        ctx.shadowBlur = isHov ? 12 : 0
+
+        const rad = Math.min(3, barW / 2)
+        ctx.beginPath()
+        ctx.moveTo(x + rad, y)
+        ctx.lineTo(x + barW - rad, y)
+        ctx.quadraticCurveTo(x + barW, y, x + barW, y + rad)
+        ctx.lineTo(x + barW, chartH)
+        ctx.lineTo(x, chartH)
+        ctx.lineTo(x, y + rad)
+        ctx.quadraticCurveTo(x, y, x + rad, y)
+        ctx.closePath()
+        ctx.fillStyle = grad
+        ctx.fill()
+        ctx.shadowBlur = 0
+
+        if (isHov && progress >= 1 && entry.count > 0) {
+          const txt = String(entry.count)
+          ctx.font = 'bold 10px system-ui'
+          const tw = ctx.measureText(txt).width
+          const bx = Math.min(Math.max(x + barW / 2 - tw / 2 - 5, 0), W - tw - 12)
+          const by = Math.max(y - 26, 0)
+          ctx.fillStyle = 'rgba(15,23,42,0.88)'
+          ctx.beginPath()
+          if (ctx.roundRect) ctx.roundRect(bx, by, tw + 10, 18, 4)
+          else ctx.rect(bx, by, tw + 10, 18)
+          ctx.fill()
+          ctx.fillStyle = '#fff'
+          ctx.textAlign = 'left'
+          ctx.fillText(txt, bx + 5, by + 13)
+        }
+      })
+
+      const fmt = (d: string) =>
+        new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      ctx.font = '10px system-ui'
+      ctx.fillStyle = 'rgba(148,163,184,0.8)'
+      ctx.textAlign = 'left'
+      ctx.fillText(fmt(data[0].date), 0, H_CSS)
+      ctx.textAlign = 'right'
+      ctx.fillText(fmt(data[data.length - 1].date), W, H_CSS)
+      if (data.length > 4) {
+        const mid = Math.floor(data.length / 2)
+        ctx.textAlign = 'center'
+        ctx.fillText(fmt(data[mid].date), mid * (barW + gapPx) + barW / 2, H_CSS)
+      }
+
+      if (progress < 1) {
+        progress += 0.03
+        rafRef.current = requestAnimationFrame(draw)
+      }
+    }
+
+    draw()
+
+    function onMouseMove(e: MouseEvent) {
+      if (!canvas) return
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const i = Math.floor(x / (barW + gapPx))
+      const next = i >= 0 && i < data.length ? i : null
+      if (hoveredRef.current !== next) {
+        hoveredRef.current = next
+        if (progress >= 1) draw()
+      }
+    }
+
+    function onMouseLeave() {
+      if (hoveredRef.current !== null) {
+        hoveredRef.current = null
+        if (progress >= 1) draw()
+      }
+    }
+
+    canvas.addEventListener('mousemove', onMouseMove)
+    canvas.addEventListener('mouseleave', onMouseLeave)
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      canvas.removeEventListener('mousemove', onMouseMove)
+      canvas.removeEventListener('mouseleave', onMouseLeave)
+    }
+  }, [data])
+
   if (data.length === 0) {
     return (
       <div className="h-32 flex items-center justify-center">
@@ -197,44 +384,7 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
     )
   }
 
-  const max = Math.max(...data.map((d) => d.count))
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-end gap-1.5 h-28">
-        {data.map((entry) => (
-          <div key={entry.date} className="flex-1 flex flex-col items-center gap-1 h-full justify-end group relative">
-            <div
-              className="w-full bg-primary/80 rounded-t-md transition-all duration-500 hover:bg-primary cursor-default min-h-[3px]"
-              style={{ height: `${max > 0 ? (entry.count / max) * 100 : 0}%` }}
-            />
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-foreground text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-              {entry.count}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-between text-xs text-muted-foreground/60 px-0.5">
-        <span>
-          {new Date(data[0].date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-        </span>
-        {data.length > 4 && (
-          <span>
-            {new Date(data[Math.floor(data.length / 2)].date).toLocaleDateString('fr-FR', {
-              day: 'numeric',
-              month: 'short',
-            })}
-          </span>
-        )}
-        <span>
-          {new Date(data[data.length - 1].date).toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'short',
-          })}
-        </span>
-      </div>
-    </div>
-  )
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '112px', display: 'block' }} />
 }
 
 export default function StatsPage() {
@@ -243,12 +393,15 @@ export default function StatsPage() {
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [statusView, setStatusView] = useState<'bar' | 'pie'>('bar')
+  const [period, setPeriod] = useState('all')
 
   useEffect(() => {
+    setLoading(true)
+    const q = period !== 'all' ? `?period=${period}` : ''
     Promise.all([
-      api.get<StatsOverview>('/stats/overview'),
-      api.get<StatusStat[]>('/stats/by-status'),
-      api.get<{ data: TimelineEntry[] }>('/stats/timeline'),
+      api.get<StatsOverview>(`/stats/overview${q}`),
+      api.get<StatusStat[]>(`/stats/by-status${q}`),
+      api.get<{ data: TimelineEntry[] }>(`/stats/timeline${q}`),
     ])
       .then(([ov, st, tl]) => {
         setOverview(ov)
@@ -257,7 +410,20 @@ export default function StatsPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [period])
+
+  const weekDiff = (overview?.thisWeekCount ?? 0) - (overview?.lastWeekCount ?? 0)
+  const weekSubLabel = overview
+    ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) + ' vs semaine dernière'
+    : '—'
+  const weekColor =
+    weekDiff > 0 ? 'text-emerald-500' : weekDiff < 0 ? 'text-red-500' : 'text-slate-500'
+  const weekBg =
+    weekDiff > 0
+      ? 'bg-emerald-50 dark:bg-emerald-950/30'
+      : weekDiff < 0
+        ? 'bg-red-50 dark:bg-red-950/30'
+        : 'bg-slate-50 dark:bg-slate-800/40'
 
   const kpis = [
     {
@@ -266,7 +432,7 @@ export default function StatsPage() {
       sub: `${overview?.activeApplications ?? 0} actives`,
       icon: Send,
       color: 'text-blue-500',
-      bg: 'bg-blue-50',
+      bg: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       label: 'Taux de réponse',
@@ -274,23 +440,39 @@ export default function StatsPage() {
       sub: 'des candidatures',
       icon: TrendingUp,
       color: 'text-emerald-500',
-      bg: 'bg-emerald-50',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
     },
     {
-      label: 'Taux d\'entretien',
+      label: "Taux d'entretien",
       value: `${overview?.interviewRate ?? 0}%`,
       sub: 'des candidatures',
       icon: CalendarCheck,
       color: 'text-violet-500',
-      bg: 'bg-violet-50',
+      bg: 'bg-violet-50 dark:bg-violet-950/30',
     },
     {
-      label: 'Taux d\'offre',
+      label: "Taux d'offre",
       value: `${overview?.offerRate ?? 0}%`,
       sub: 'des candidatures',
       icon: Trophy,
       color: 'text-amber-500',
-      bg: 'bg-amber-50',
+      bg: 'bg-amber-50 dark:bg-amber-950/30',
+    },
+    {
+      label: 'Délai moyen de réponse',
+      value: overview?.avgResponseDays != null ? `${overview.avgResponseDays}j` : '—',
+      sub: 'entre envoi et réponse',
+      icon: Clock,
+      color: 'text-slate-500',
+      bg: 'bg-slate-50 dark:bg-slate-800/40',
+    },
+    {
+      label: 'Cette semaine',
+      value: overview?.thisWeekCount ?? 0,
+      sub: overview ? weekSubLabel : '—',
+      icon: Activity,
+      color: weekColor,
+      bg: weekBg,
     },
   ]
 
@@ -301,51 +483,72 @@ export default function StatsPage() {
           value: overview.total,
           pct: 100,
           color: 'bg-blue-500',
-          light: 'bg-blue-50',
-          text: 'text-blue-700',
+          light: 'bg-blue-50 dark:bg-blue-900/30',
+          text: 'text-blue-700 dark:text-blue-400',
         },
         {
           label: 'Réponses reçues',
           value: Math.round((overview.responseRate / 100) * overview.total),
           pct: overview.responseRate,
           color: 'bg-emerald-500',
-          light: 'bg-emerald-50',
-          text: 'text-emerald-700',
+          light: 'bg-emerald-50 dark:bg-emerald-900/30',
+          text: 'text-emerald-700 dark:text-emerald-400',
         },
         {
           label: 'Entretiens obtenus',
           value: Math.round((overview.interviewRate / 100) * overview.total),
           pct: overview.interviewRate,
           color: 'bg-violet-500',
-          light: 'bg-violet-50',
-          text: 'text-violet-700',
+          light: 'bg-violet-50 dark:bg-violet-900/30',
+          text: 'text-violet-700 dark:text-violet-400',
         },
         {
           label: 'Offres reçues',
           value: Math.round((overview.offerRate / 100) * overview.total),
           pct: overview.offerRate,
           color: 'bg-amber-500',
-          light: 'bg-amber-50',
-          text: 'text-amber-700',
+          light: 'bg-amber-50 dark:bg-amber-900/30',
+          text: 'text-amber-700 dark:text-amber-400',
         },
       ]
     : []
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Statistiques</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Vue globale de votre recherche d&apos;emploi</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Statistiques</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Vue globale de votre recherche d&apos;emploi
+          </p>
+        </div>
+        <div className="flex items-center p-1 bg-secondary rounded-xl border border-border">
+          {PERIODS.map((p) => (
+            <button
+              key={p.value}
+              onClick={() => setPeriod(p.value)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                period === p.value
+                  ? 'bg-card shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
-          ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-36 rounded-2xl" />
+            ))
           : kpis.map((k) => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-semibold text-sm">Répartition par statut</h2>
             {!loading && byStatus.length > 0 && (
@@ -355,7 +558,7 @@ export default function StatsPage() {
                   aria-label="Vue barres"
                   className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
                     statusView === 'bar'
-                      ? 'bg-white text-foreground shadow-sm'
+                      ? 'bg-card text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -366,7 +569,7 @@ export default function StatsPage() {
                   aria-label="Vue camembert"
                   className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${
                     statusView === 'pie'
-                      ? 'bg-white text-foreground shadow-sm'
+                      ? 'bg-card text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -417,7 +620,7 @@ export default function StatsPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <h2 className="font-semibold text-sm mb-5">Funnel de conversion</h2>
           {loading ? (
             <div className="space-y-3">
@@ -442,9 +645,7 @@ export default function StatsPage() {
                       {step.value}
                     </span>
                   </div>
-                  {i < funnelSteps.length - 1 && (
-                    <div className="w-px h-2 bg-border ml-4" />
-                  )}
+                  {i < funnelSteps.length - 1 && <div className="w-px h-2 bg-border ml-4" />}
                 </div>
               ))}
             </div>
@@ -452,12 +653,13 @@ export default function StatsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-6">
+      <div className="bg-card rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-semibold text-sm">Activité</h2>
+          <h2 className="font-semibold dark:text-white text-sm">Activité</h2>
           {!loading && timeline.length > 0 && (
             <span className="text-xs text-muted-foreground">
-              {timeline.reduce((s, d) => s + d.count, 0)} candidatures sur {timeline.length} jour{timeline.length > 1 ? 's' : ''}
+              {timeline.reduce((s, d) => s + d.count, 0)} candidatures sur {timeline.length} jour
+              {timeline.length > 1 ? 's' : ''}
             </span>
           )}
         </div>

@@ -1,36 +1,48 @@
 'use client'
 
-import { useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { api } from '@/lib/api'
 import { setTokens, storeUser, type AuthUser } from '@/lib/auth'
 
-export default function CallbackPage() {
+function CallbackContent() {
   const router = useRouter()
   const params = useSearchParams()
 
   useEffect(() => {
-    const accessToken = params.get('access_token')
-    const refreshToken = params.get('refresh_token')
-    const id = params.get('id')
-    const email = params.get('email')
-    const name = params.get('name')
-    const plan = params.get('plan')
-    const onboardingCompleted = params.get('onboarding_completed') === 'true'
-
-    if (!accessToken || !refreshToken || !id || !email || !plan) {
+    const code = params.get('code')
+    if (!code) {
       router.replace('/login')
       return
     }
 
-    const user: AuthUser = { id, email, name: name || null, plan, avatar: null, onboardingCompleted }
-    setTokens(accessToken, refreshToken)
-    storeUser(user)
-    router.replace(onboardingCompleted ? '/dashboard' : '/onboarding')
+    api
+      .post<{ tokens: { accessToken: string; refreshToken: string }; user: AuthUser }>(
+        '/auth/exchange-code',
+        { code },
+      )
+      .then(async ({ tokens, user }) => {
+        await setTokens(tokens.accessToken, tokens.refreshToken)
+        storeUser(user)
+        router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding')
+      })
+      .catch(() => {
+        router.replace('/login')
+      })
   }, [params, router])
 
+  return null
+}
+
+export default function CallbackPage() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <p className="text-sm text-muted-foreground">Connexion en cours…</p>
+      <Suspense fallback={null}>
+        <CallbackContent />
+      </Suspense>
     </div>
   )
 }

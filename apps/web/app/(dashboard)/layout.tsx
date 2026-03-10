@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-secondary/30 flex">
 
-      <aside className="w-56 bg-white border-r border-border flex flex-col fixed inset-y-0 left-0 z-30 hidden md:flex">
+      <aside className="w-56 bg-card border-r border-border flex flex-col fixed inset-y-0 left-0 z-30 hidden md:flex">
         <div className="px-5 py-6 border-b border-border">
           <Link href="/dashboard" className="font-bold text-lg tracking-tight">
             Careerly
@@ -133,9 +133,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col transform transition-transform duration-250 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden border-r border-border ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ backgroundColor: 'hsl(var(--card))' }}
       >
         <div className="px-5 py-5 border-b border-border flex items-center justify-between">
           <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-lg tracking-tight">
@@ -160,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       <div className="flex-1 md:ml-56 flex flex-col min-h-screen">
-        <header className="bg-white border-b border-border px-4 py-3.5 flex items-center justify-between md:hidden sticky top-0 z-30">
+        <header className="bg-card border-b border-border px-4 py-3.5 flex items-center justify-between md:hidden sticky top-0 z-30">
           <Link href="/dashboard" className="font-bold text-base tracking-tight">
             Careerly
           </Link>
