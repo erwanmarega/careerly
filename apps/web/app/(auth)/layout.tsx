@@ -1,10 +1,5 @@
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { CheckCircle2 } from 'lucide-react'
-
-const ThreeAuthBackground = dynamic(() => import('@/components/ThreeAuthBackground'), {
-  ssr: false,
-})
 
 const features = [
   'Toutes vos candidatures en un seul endroit',
@@ -29,9 +24,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       <div className="hidden lg:flex w-[460px] xl:w-[520px] shrink-0 bg-zinc-950 relative overflow-hidden flex-col justify-center p-14">
-        <ThreeAuthBackground className="absolute inset-0 w-full h-full" />
+        <div className="absolute -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-violet-600/25 blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-[340px] h-[340px] rounded-full bg-indigo-500/20 blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] rounded-full bg-violet-800/15 blur-[80px] pointer-events-none" />
 
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-150/80 via-zinc-950/60 to-zinc-950/40 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-950/40 via-zinc-950/70 to-zinc-950/90 z-[1]" />
 
         <div className="relative z-10">
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-600 mb-10">
