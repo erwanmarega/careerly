@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AuthGuard } from '@nestjs/passport'
+import { Throttle } from '@nestjs/throttler'
 import type { User } from '@prisma/client'
 import type { Request, Response } from 'express'
 
@@ -21,12 +22,14 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto)
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto)
   }
@@ -47,6 +50,7 @@ export class AuthController {
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60000, limit: 3 } })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto.email)
   }

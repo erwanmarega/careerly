@@ -1,7 +1,8 @@
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
+import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 
 import { AiModule } from './ai/ai.module'
 import { ApplicationsModule } from './applications/applications.module'
@@ -20,7 +21,7 @@ import { UsersModule } from './users/users.module'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: () => ({
-        throttlers: [{ ttl: 60000, limit: 100 }],
+        throttlers: [{ name: 'default', ttl: 60000, limit: 100 }],
       }),
     }),
     BullModule.forRootAsync({
@@ -40,5 +41,6 @@ import { UsersModule } from './users/users.module'
     MailModule,
     AiModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

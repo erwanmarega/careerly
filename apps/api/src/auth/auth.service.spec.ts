@@ -313,11 +313,24 @@ describe('AuthService', () => {
         .mockResolvedValueOnce('refresh-token')
       prisma.user.update.mockResolvedValue(mockUser)
 
-      const result = await service.exchangeOAuthCode('valid-code')
+      const result = await service.exchangeOAuthCode('unique-code')
 
       expect(result.tokens).toEqual({ accessToken: 'access-token', refreshToken: 'refresh-token' })
       expect(result.user).not.toHaveProperty('password')
       expect(result.user).not.toHaveProperty('refreshToken')
+    })
+
+    it('throws UnauthorizedException when the same code is used twice', async () => {
+      ;(jwt.verifyAsync as jest.Mock).mockResolvedValue({ sub: 'user-1', type: 'oauth_code' })
+      prisma.user.findUnique.mockResolvedValue(mockUser)
+      ;(jwt.signAsync as jest.Mock)
+        .mockResolvedValueOnce('access-token')
+        .mockResolvedValueOnce('refresh-token')
+      prisma.user.update.mockResolvedValue(mockUser)
+
+      await service.exchangeOAuthCode('reused-code')
+
+      await expect(service.exchangeOAuthCode('reused-code')).rejects.toThrow(UnauthorizedException)
     })
   })
 })

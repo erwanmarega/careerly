@@ -14,11 +14,14 @@ async function bootstrap() {
   const allowedOrigins = [
     'http://localhost:3000',
     process.env.FRONTEND_URL,
+    process.env.CHROME_EXTENSION_ID
+      ? `chrome-extension://${process.env.CHROME_EXTENSION_ID}`
+      : undefined,
   ].filter(Boolean)
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true)
       } else {
         callback(new Error(`CORS: origin not allowed — ${origin}`))

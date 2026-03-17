@@ -12,6 +12,8 @@ import type { RegisterDto } from './dto/register.dto'
 
 @Injectable()
 export class AuthService {
+  private readonly usedOAuthCodes = new Set<string>()
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
@@ -84,6 +86,8 @@ export class AuthService {
   }
 
   async exchangeOAuthCode(code: string) {
+    if (this.usedOAuthCodes.has(code)) throw new UnauthorizedException('Code déjà utilisé')
+
     let payload: { sub: string; type: string }
     try {
       payload = await this.jwt.verifyAsync(code, {
@@ -94,6 +98,9 @@ export class AuthService {
     }
 
     if (payload.type !== 'oauth_code') throw new UnauthorizedException('Code invalide')
+
+    this.usedOAuthCodes.add(code)
+    setTimeout(() => this.usedOAuthCodes.delete(code), 30_000).unref()
 
     const user = await this.prisma.user.findUnique({ where: { id: payload.sub } })
     if (!user) throw new UnauthorizedException()
