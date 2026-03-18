@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Postulo — Suivi de candidatures",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ajoutez une candidature Postulo en un clic depuis LinkedIn, Indeed, Welcome to the Jungle, JobTeaser et HelloWork.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
