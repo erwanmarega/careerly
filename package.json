@@ -1,5 +1,5 @@
 {
-  "name": "careerly",
+  "name": "postulo",
   "private": true,
   "scripts": {
     "build": "turbo run build",

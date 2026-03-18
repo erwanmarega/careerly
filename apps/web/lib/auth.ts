@@ -26,13 +26,13 @@ export async function setTokens(accessToken: string, refreshToken: string) {
 export async function clearTokens() {
   document.cookie = 'access_token=; path=/; max-age=0'
   await fetch('/api/auth/session', { method: 'DELETE' })
-  localStorage.removeItem('careerly_user')
+  localStorage.removeItem('postulo_user')
 }
 
 export function getStoredUser(): AuthUser | null {
   if (typeof window === 'undefined') return null
   try {
-    const raw = localStorage.getItem('careerly_user')
+    const raw = localStorage.getItem('postulo_user')
     return raw ? (JSON.parse(raw) as AuthUser) : null
   } catch {
     return null
@@ -40,7 +40,7 @@ export function getStoredUser(): AuthUser | null {
 }
 
 export function storeUser(user: AuthUser) {
-  localStorage.setItem('careerly_user', JSON.stringify(user))
+  localStorage.setItem('postulo_user', JSON.stringify(user))
 }
 
 export async function login(email: string, password: string) {

@@ -40,19 +40,19 @@ const mockApplications = [
 ]
 
 const comparison = [
-  { feature: 'Suivi des candidatures', spreadsheet: true, careerly: true },
-  { feature: 'Rappels de relance', spreadsheet: false, careerly: true },
-  { feature: 'Historique des statuts', spreadsheet: false, careerly: true },
-  { feature: 'Stats sur votre recherche', spreadsheet: false, careerly: true },
-  { feature: 'Accessible partout', spreadsheet: false, careerly: true },
-  { feature: 'Export PDF', spreadsheet: false, careerly: true },
+  { feature: 'Suivi des candidatures', spreadsheet: true, postulo: true },
+  { feature: 'Rappels de relance', spreadsheet: false, postulo: true },
+  { feature: 'Historique des statuts', spreadsheet: false, postulo: true },
+  { feature: 'Stats sur votre recherche', spreadsheet: false, postulo: true },
+  { feature: 'Accessible partout', spreadsheet: false, postulo: true },
+  { feature: 'Export PDF', spreadsheet: false, postulo: true },
 ]
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <header className="px-6 sm:px-10 py-5 flex items-center justify-between max-w-6xl mx-auto">
-        <span className="font-black text-xl tracking-tight">Careerly</span>
+        <span className="font-black text-xl tracking-tight">Postulo</span>
         <div className="flex items-center gap-6">
           <a
             href="#tarifs"
@@ -93,7 +93,7 @@ export default function LandingPage() {
                 du reste.
               </h1>
               <p className="text-base text-zinc-400 leading-relaxed mb-10 max-w-sm">
-                Arrêtez de perdre le fil dans un tableur. Careerly centralise tout — statuts,
+                Arrêtez de perdre le fil dans un tableur. Postulo centralise tout — statuts,
                 relances, historique.
               </p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -206,7 +206,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-12 pt-10 border-t-2 border-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
-              <p className="text-2xl font-black">Careerly centralise tout ça.</p>
+              <p className="text-2xl font-black">Postulo centralise tout ça.</p>
               <p className="text-muted-foreground mt-1 text-sm">
                 Une seule page. Toutes vos candidatures. Toujours à jour.
               </p>
@@ -262,12 +262,12 @@ export default function LandingPage() {
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 lg:sticky lg:top-8">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-500 mb-6">
-                Careerly vs Excel
+                Postulo vs Excel
               </p>
               <div className="grid grid-cols-3 pb-4 border-b border-zinc-800">
                 <span />
                 <span className="text-xs font-medium text-center text-zinc-600">Excel</span>
-                <span className="text-xs font-bold text-center text-primary">Careerly</span>
+                <span className="text-xs font-bold text-center text-primary">Postulo</span>
               </div>
               {comparison.map((row) => (
                 <div
@@ -377,7 +377,7 @@ export default function LandingPage() {
 
       <footer className="bg-zinc-950 border-t border-zinc-800">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-black text-sm text-white">Careerly</span>
+          <span className="font-black text-sm text-white">Postulo</span>
           <p className="text-xs text-zinc-600">
             © {new Date().getFullYear()} — Tous droits réservés
           </p>

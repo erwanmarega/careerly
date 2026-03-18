@@ -12,8 +12,8 @@ export function useUser() {
     try {
       const data = await api.get<AuthUser>('/users/me')
       setUser(data)
-      localStorage.setItem('careerly_user', JSON.stringify(data))
-      window.dispatchEvent(new CustomEvent('careerly:user-updated', { detail: data }))
+      localStorage.setItem('postulo_user', JSON.stringify(data))
+      window.dispatchEvent(new CustomEvent('postulo:user-updated', { detail: data }))
     } catch {}
   }
 
@@ -28,7 +28,7 @@ export function useUser() {
       .get<AuthUser>('/users/me')
       .then((data) => {
         setUser(data)
-        localStorage.setItem('careerly_user', JSON.stringify(data))
+        localStorage.setItem('postulo_user', JSON.stringify(data))
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -38,8 +38,8 @@ export function useUser() {
     function handleUpdated(e: CustomEvent) {
       setUser(e.detail)
     }
-    window.addEventListener('careerly:user-updated', handleUpdated as EventListener)
-    return () => window.removeEventListener('careerly:user-updated', handleUpdated as EventListener)
+    window.addEventListener('postulo:user-updated', handleUpdated as EventListener)
+    return () => window.removeEventListener('postulo:user-updated', handleUpdated as EventListener)
   }, [])
 
   return { user, loading, refresh }

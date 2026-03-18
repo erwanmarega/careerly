@@ -79,7 +79,7 @@ export default function OnboardingPage() {
             <span className="text-primary">{firstName} !</span>
           </h1>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Careerly vous aide à garder le fil de votre recherche d'emploi.
+            Postulo vous aide à garder le fil de votre recherche d'emploi.
           </p>
           <ul className="space-y-3 mb-10">
             {[

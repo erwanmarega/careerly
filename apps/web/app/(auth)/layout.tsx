@@ -14,12 +14,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="flex-1 flex flex-col bg-background min-w-0">
         <header className="px-8 py-6 shrink-0">
           <Link href="/" className="font-bold text-xl tracking-tight">
-            Careerly
+            Postulo
           </Link>
         </header>
         <main className="flex-1 flex items-center justify-center px-6 py-8">{children}</main>
         <footer className="px-8 py-4 shrink-0">
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Careerly</p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Postulo</p>
         </footer>
       </div>
 
@@ -32,7 +32,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative z-10">
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-600 mb-10">
-            Careerly
+            Postulo
           </p>
 
           <h2 className="text-4xl xl:text-5xl tracking-tighter text-white leading-[1.05] mb-4">

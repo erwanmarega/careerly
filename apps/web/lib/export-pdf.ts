@@ -16,7 +16,7 @@ export async function exportApplicationsPdf(applications: Application[]) {
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(14)
   doc.setFont('helvetica', 'bold')
-  doc.text('Careerly', 14, 13)
+  doc.text('Postulo', 14, 13)
 
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')

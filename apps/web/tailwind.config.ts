@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss'
-import baseConfig from '@careerly/tailwind-config'
+import baseConfig from '@postulo/tailwind-config'
 
 const config: Config = {
   ...baseConfig,

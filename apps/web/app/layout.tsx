@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
 
 export const metadata: Metadata = {
-  title: 'Careerly — Suivi de candidatures',
+  title: 'Postulo — Suivi de candidatures',
   description: 'Gérez vos candidatures, suivez vos relances et boostez votre recherche d\'emploi.',
 }
 

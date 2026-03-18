@@ -1,5 +1,5 @@
 {
-  "name": "@careerly/api",
+  "name": "@postulo/api",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -44,8 +44,8 @@
     "stripe": "^15.5.0"
   },
   "devDependencies": {
-    "@careerly/tsconfig": "workspace:*",
-    "@careerly/types": "workspace:*",
+    "@postulo/tsconfig": "workspace:*",
+    "@postulo/types": "workspace:*",
     "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/testing": "^10.3.8",

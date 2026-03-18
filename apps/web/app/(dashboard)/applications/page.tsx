@@ -214,7 +214,7 @@ export default function ApplicationsPage() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `careerly-${new Date().toISOString().split('T')[0]}.csv`
+      a.download = `postulo-${new Date().toISOString().split('T')[0]}.csv`
       a.click()
       URL.revokeObjectURL(url)
     } catch {

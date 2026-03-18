@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Careerly — Suivi de candidatures",
+  "name": "Postulo — Suivi de candidatures",
   "version": "1.0.0",
-  "description": "Ajoutez une candidature Careerly en un clic depuis LinkedIn, Indeed, Welcome to the Jungle, JobTeaser et HelloWork.",
+  "description": "Ajoutez une candidature Postulo en un clic depuis LinkedIn, Indeed, Welcome to the Jungle, JobTeaser et HelloWork.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
     "https://www.linkedin.com/*",

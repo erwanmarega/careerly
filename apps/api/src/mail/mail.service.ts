@@ -33,7 +33,7 @@ export class MailService {
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
     <div style="background:#6d28d9;padding:20px 28px;">
-      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Careerly</span>
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Postulo</span>
     </div>
     <div style="padding:28px 28px 8px;">
       <p style="margin:0 0 16px;font-size:14px;color:#6b7280;">Bonjour ${options.name},</p>
@@ -48,7 +48,7 @@ export class MailService {
       <a href="${appUrl}" style="display:inline-block;background:#6d28d9;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:11px 22px;border-radius:8px;margin-bottom:28px;">Voir la candidature →</a>
     </div>
     <div style="padding:12px 28px 16px;border-top:1px solid #f3f4f6;">
-      <p style="margin:0;font-size:11px;color:#9ca3af;">Vous recevez cet email car vous avez configuré un rappel sur Careerly. Pour ne plus en recevoir, supprimez vos rappels dans l'application.</p>
+      <p style="margin:0;font-size:11px;color:#9ca3af;">Vous recevez cet email car vous avez configuré un rappel sur Postulo. Pour ne plus en recevoir, supprimez vos rappels dans l'application.</p>
     </div>
   </div>
 </body>
@@ -68,7 +68,7 @@ export class MailService {
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
     <div style="background:#6d28d9;padding:20px 28px;">
-      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Careerly</span>
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Postulo</span>
     </div>
     <div style="padding:28px 28px 8px;">
       <p style="margin:0 0 16px;font-size:14px;color:#6b7280;">Bonjour ${name},</p>
@@ -78,7 +78,7 @@ export class MailService {
       <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">Si vous n'avez pas fait cette demande, ignorez cet email.</p>
     </div>
     <div style="padding:12px 28px 16px;border-top:1px solid #f3f4f6;">
-      <p style="margin:0;font-size:11px;color:#9ca3af;">Careerly — Votre assistant de recherche d'emploi</p>
+      <p style="margin:0;font-size:11px;color:#9ca3af;">Postulo — Votre assistant de recherche d'emploi</p>
     </div>
   </div>
 </body>
@@ -87,7 +87,7 @@ export class MailService {
     const { error } = await this.resend.emails.send({
       from: this.from,
       to,
-      subject: 'Réinitialisation de votre mot de passe Careerly',
+      subject: 'Réinitialisation de votre mot de passe Postulo',
       html,
     })
     if (error) {
@@ -101,11 +101,11 @@ export class MailService {
       await this.resend.emails.send({
         from: this.from,
         to,
-        subject: 'Welcome to Careerly!',
+        subject: 'Welcome to Postulo!',
         html: `
-          <h2>Welcome to Careerly, ${name}!</h2>
+          <h2>Welcome to Postulo, ${name}!</h2>
           <p>Start tracking your job applications and stay on top of your job search.</p>
-          <p>The Careerly Team</p>
+          <p>The Postulo Team</p>
         `,
       })
     } catch (error) {

@@ -112,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="w-56 bg-card border-r border-border flex flex-col fixed inset-y-0 left-0 z-30 hidden md:flex">
         <div className="px-5 py-6 border-b border-border">
           <Link href="/dashboard" className="font-bold text-lg tracking-tight">
-            Careerly
+            Postulo
           </Link>
         </div>
         <SidebarContent
@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         <div className="px-5 py-5 border-b border-border flex items-center justify-between">
           <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-lg tracking-tight">
-            Careerly
+            Postulo
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
@@ -163,7 +163,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 md:ml-56 flex flex-col min-h-screen">
         <header className="bg-card border-b border-border px-4 py-3.5 flex items-center justify-between md:hidden sticky top-0 z-30">
           <Link href="/dashboard" className="font-bold text-base tracking-tight">
-            Careerly
+            Postulo
           </Link>
           <button
             onClick={() => setMobileOpen(true)}

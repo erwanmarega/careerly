@@ -63,7 +63,7 @@ export class ApplicationsController {
     const csv = await this.applicationsService.exportCsv(user.id)
     const date = new Date().toISOString().split('T')[0]
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', `attachment; filename="careerly-${date}.csv"`)
+    res.setHeader('Content-Disposition', `attachment; filename="postulo-${date}.csv"`)
     res.send('\uFEFF' + csv)
   }
 

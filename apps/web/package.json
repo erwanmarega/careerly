@@ -1,5 +1,5 @@
 {
-  "name": "@careerly/web",
+  "name": "@postulo/web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@careerly/types": "workspace:*",
+    "@postulo/types": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "jspdf": "^4.2.0",
@@ -22,8 +22,8 @@
     "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {
-    "@careerly/tailwind-config": "workspace:*",
-    "@careerly/tsconfig": "workspace:*",
+    "@postulo/tailwind-config": "workspace:*",
+    "@postulo/tsconfig": "workspace:*",
     "@types/node": "^20.12.7",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
