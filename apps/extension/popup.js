@@ -217,7 +217,7 @@ async function handleSubmit(e) {
 
     createdAppId = json.data.id
     $('success-desc').textContent = `${body.position} chez ${body.company}`
-    $('open-app-btn').href = `https://careerly-web.vercel.app/applications/${createdAppId}`
+    $('open-app-btn').href = `https://www.postulo.fr/applications/${createdAppId}`
     showView('view-success')
   } catch (err) {
     errorBox.textContent = err.message || 'Une erreur est survenue'
