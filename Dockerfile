@@ -12,9 +12,9 @@ COPY apps/api/ ./apps/api/
 
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm --filter @careerly/api exec prisma generate
+RUN pnpm --filter @postulo/api exec prisma generate
 
-RUN pnpm --filter @careerly/api build
+RUN pnpm --filter @postulo/api build
 
 WORKDIR /app/apps/api
 
