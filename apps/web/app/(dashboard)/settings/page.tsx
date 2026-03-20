@@ -190,14 +190,8 @@ export default function SettingsPage() {
         plan: string
         id: string
       }>('/users/me', { name: name.trim() || undefined })
-      storeUser({
-        id: updated.id,
-        email: updated.email,
-        name: updated.name,
-        plan: updated.plan,
-        avatar: avatar,
-        onboardingCompleted: true,
-      })
+      const current = getStoredUser()
+      if (current) storeUser({ ...current, name: updated.name, email: updated.email, plan: updated.plan, avatar })
       setProfileSuccess(true)
       setTimeout(() => setProfileSuccess(false), 3000)
     } catch (err) {
