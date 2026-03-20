@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import type { User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { unlinkSync } from 'fs'
@@ -7,6 +7,7 @@ import { join } from 'path'
 import { PrismaService } from '../prisma/prisma.service'
 import type { UpdatePasswordDto } from './dto/update-password.dto'
 import type { UpdateUserDto } from './dto/update-user.dto'
+import type { JoinSchoolDto } from './dto/join-school.dto'
 
 @Injectable()
 export class UsersService {
@@ -66,6 +67,45 @@ export class UsersService {
       data: { onboardingCompleted: true },
     })
     return this.sanitize(user)
+  }
+
+  async joinSchool(id: string, dto: JoinSchoolDto) {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id } })
+
+    if (user.role === 'SCHOOL_ADMIN') {
+      throw new BadRequestException('Les administrateurs d\'école ne peuvent pas rejoindre une école')
+    }
+    if (user.schoolId) {
+      throw new BadRequestException('Vous faites déjà partie d\'une école')
+    }
+
+    const school = await this.prisma.school.findUnique({ where: { inviteCode: dto.inviteCode } })
+    if (!school) throw new NotFoundException('Code d\'invitation invalide')
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: { schoolId: school.id, schoolRemovedAt: null },
+    })
+
+    return { school, user: this.sanitize(updated) }
+  }
+
+  async leaveSchool(id: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id } })
+
+    if (user.role === 'SCHOOL_ADMIN') {
+      throw new BadRequestException('Supprimez votre école avant de la quitter')
+    }
+    if (!user.schoolId) {
+      throw new BadRequestException('Vous n\'êtes dans aucune école')
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: { schoolId: null },
+    })
+
+    return this.sanitize(updated)
   }
 
   async delete(id: string) {

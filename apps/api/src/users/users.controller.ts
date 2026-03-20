@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { User } from '@prisma/client'
 import { diskStorage } from 'multer'
@@ -19,6 +20,7 @@ import { extname, join } from 'path'
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CurrentUser } from '../common/decorators/current-user.decorator'
+import { JoinSchoolDto } from './dto/join-school.dto'
 import { UpdatePasswordDto } from './dto/update-password.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UsersService } from './users.service'
@@ -76,6 +78,17 @@ export class UsersController {
   @Patch('me/onboarding')
   completeOnboarding(@CurrentUser() user: User) {
     return this.usersService.completeOnboarding(user.id)
+  }
+
+  @Post('me/join-school')
+  joinSchool(@CurrentUser() user: User, @Body() dto: JoinSchoolDto) {
+    return this.usersService.joinSchool(user.id, dto)
+  }
+
+  @Delete('me/school')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  leaveSchool(@CurrentUser() user: User) {
+    return this.usersService.leaveSchool(user.id)
   }
 
   @Delete('me')

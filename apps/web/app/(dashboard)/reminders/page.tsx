@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bell, CalendarClock, Plus, Trash2, X } from 'lucide-react'
+import { Bell, CalendarClock, Plus, Trash2, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import { useUser } from '@/hooks/useUser'
 import { fetchApplications, type Application } from '@/lib/applications'
 
 interface Reminder {
@@ -91,7 +90,6 @@ function ReminderCard({
 }
 
 export default function RemindersPage() {
-  const { user } = useUser()
   const [reminders, setReminders] = useState<Reminder[]>([])
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
@@ -148,7 +146,6 @@ export default function RemindersPage() {
   const now = new Date()
   const upcoming = reminders.filter((r) => !r.sent && new Date(r.scheduledAt) > now)
   const past = reminders.filter((r) => r.sent || new Date(r.scheduledAt) <= now)
-  const isFree = user?.plan === 'FREE'
   const minDateTime = new Date(Date.now() + 60_000).toISOString().slice(0, 16)
 
   return (
@@ -160,41 +157,16 @@ export default function RemindersPage() {
             Recevez un email pour ne pas oublier de relancer
           </p>
         </div>
-        {!isFree && (
-          <button
+        <button
             onClick={() => setShowForm((v) => !v)}
             className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
             Ajouter
           </button>
-        )}
       </div>
 
-      {isFree && (
-        <div className="bg-primary rounded-2xl p-6 text-white">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-              <Bell className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold mb-1">Les rappels sont réservés au plan Pro</p>
-              <p className="text-sm text-white/70 leading-relaxed mb-4">
-                Ne laissez plus aucune candidature sans relance. Recevez des rappels par email
-                exactement au moment choisi.
-              </p>
-              <Link
-                href="/settings"
-                className="inline-flex items-center gap-1.5 bg-white text-primary text-sm font-semibold px-4 py-2 rounded-xl hover:bg-white/90 transition-colors"
-              >
-                Passer en Pro <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showForm && !isFree && (
+      {showForm && (
         <div className="bg-card rounded-2xl border border-border p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-semibold text-sm">Nouveau rappel</h2>
@@ -298,7 +270,7 @@ export default function RemindersPage() {
             <Skeleton key={i} className="h-[72px] rounded-2xl" />
           ))}
         </div>
-      ) : reminders.length === 0 && !isFree ? (
+      ) : reminders.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border px-6 py-16 text-center">
           <CalendarClock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">Aucun rappel pour le moment.</p>

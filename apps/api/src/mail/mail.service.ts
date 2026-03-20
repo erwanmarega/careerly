@@ -96,6 +96,80 @@ export class MailService {
     }
   }
 
+  async sendSchoolReminderEmail(to: string, studentName: string, schoolName: string, frontendUrl?: string) {
+    const url = frontendUrl ?? this.frontendUrl
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
+    <div style="background:#6d28d9;padding:20px 28px;">
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Postulo</span>
+    </div>
+    <div style="padding:28px 28px 8px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#6b7280;">Bonjour ${studentName},</p>
+      <h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#111827;">Un petit rappel de votre école 👋</h2>
+      <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
+        <strong>${schoolName}</strong> vous rappelle de ne pas oublier votre recherche d'alternance. Connectez-vous à Postulo pour ajouter vos candidatures et suivre votre avancement.
+      </p>
+      <a href="${url}/dashboard" style="display:inline-block;background:#6d28d9;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:11px 22px;border-radius:8px;margin-bottom:28px;">Accéder à mon espace →</a>
+    </div>
+    <div style="padding:12px 28px 16px;border-top:1px solid #f3f4f6;">
+      <p style="margin:0;font-size:11px;color:#9ca3af;">Ce message a été envoyé par votre responsable formation via Postulo.</p>
+    </div>
+  </div>
+</body>
+</html>`
+
+    const { error } = await this.resend.emails.send({
+      from: this.from,
+      to,
+      subject: `📬 Rappel de ${schoolName} — pensez à vos candidatures !`,
+      html,
+    })
+    if (error) {
+      this.logger.error('Failed to send school reminder email', error)
+      throw new Error(`Resend error: ${error.message}`)
+    }
+  }
+
+  async sendRemovedFromSchoolEmail(to: string, studentName: string, schoolName: string) {
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
+    <div style="background:#6d28d9;padding:20px 28px;">
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.02em;">Postulo</span>
+    </div>
+    <div style="padding:28px 28px 8px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#6b7280;">Bonjour ${studentName},</p>
+      <h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#111827;">Vous avez été retiré de votre école</h2>
+      <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
+        Votre compte n'est plus associé à <strong>${schoolName}</strong> sur Postulo. Votre historique de candidatures est conservé et reste accessible.
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.6;">
+        Si vous pensez qu'il s'agit d'une erreur, contactez directement votre responsable formation.
+      </p>
+      <a href="${this.frontendUrl}/dashboard" style="display:inline-block;background:#6d28d9;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:11px 22px;border-radius:8px;margin-bottom:28px;">Accéder à mon espace →</a>
+    </div>
+    <div style="padding:12px 28px 16px;border-top:1px solid #f3f4f6;">
+      <p style="margin:0;font-size:11px;color:#9ca3af;">Postulo — Votre assistant de recherche d'emploi</p>
+    </div>
+  </div>
+</body>
+</html>`
+
+    const { error } = await this.resend.emails.send({
+      from: this.from,
+      to,
+      subject: `Vous avez été retiré de ${schoolName}`,
+      html,
+    })
+    if (error) {
+      this.logger.error('Failed to send removed-from-school email', error)
+      throw new Error(`Resend error: ${error.message}`)
+    }
+  }
+
   async sendWelcomeEmail(to: string, name: string) {
     try {
       await this.resend.emails.send({

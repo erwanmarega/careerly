@@ -5,6 +5,8 @@ export interface AuthUser {
   email: string
   name: string | null
   plan: string
+  role: 'STUDENT' | 'SCHOOL_ADMIN'
+  schoolId: string | null
   avatar: string | null
   onboardingCompleted?: boolean
 }
@@ -25,6 +27,7 @@ export async function setTokens(accessToken: string, refreshToken: string) {
 
 export async function clearTokens() {
   document.cookie = 'access_token=; path=/; max-age=0'
+  document.cookie = 'user_role=; path=/; max-age=0'
   await fetch('/api/auth/session', { method: 'DELETE' })
   localStorage.removeItem('postulo_user')
 }
@@ -41,6 +44,7 @@ export function getStoredUser(): AuthUser | null {
 
 export function storeUser(user: AuthUser) {
   localStorage.setItem('postulo_user', JSON.stringify(user))
+  document.cookie = `user_role=${user.role ?? 'STUDENT'}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
 }
 
 export async function login(email: string, password: string) {

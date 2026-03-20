@@ -26,7 +26,11 @@ function CallbackContent() {
       .then(async ({ tokens, user }) => {
         await setTokens(tokens.accessToken, tokens.refreshToken)
         storeUser(user)
-        router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding')
+        if (user.role === 'SCHOOL_ADMIN') {
+          router.replace('/admin/dashboard')
+        } else {
+          router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding')
+        }
       })
       .catch(() => {
         router.replace('/login')

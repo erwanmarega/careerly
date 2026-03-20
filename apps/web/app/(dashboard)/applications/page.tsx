@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowRight,
   ArrowUpDown,
   Check,
   Download,
@@ -25,7 +24,6 @@ import {
 } from '@/lib/applications'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { api } from '@/lib/api'
-import { useUser } from '@/hooks/useUser'
 
 const SORT_OPTIONS = [
   { value: 'appliedAt:desc', label: 'Date (récent)' },
@@ -110,9 +108,6 @@ function Skeleton({ className }: { className?: string }) {
 const LIMIT = 20
 
 export default function ApplicationsPage() {
-  const { user } = useUser()
-  const isFree = user?.plan === 'FREE'
-
   const [applications, setApplications] = useState<Application[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -121,7 +116,6 @@ export default function ApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [sort, setSort] = useState('appliedAt:desc')
   const [exportingCsv, setExportingCsv] = useState(false)
-  const [showCsvUpgradeModal, setShowCsvUpgradeModal] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
@@ -197,10 +191,6 @@ export default function ApplicationsPage() {
   }
 
   async function handleExportCsv() {
-    if (isFree) {
-      setShowCsvUpgradeModal(true)
-      return
-    }
     setExportingCsv(true)
     try {
       const match = document.cookie.match(/(?:^|; )access_token=([^;]*)/)
@@ -386,7 +376,7 @@ export default function ApplicationsPage() {
             onClick={handleExportCsv}
             disabled={exportingCsv}
             className="inline-flex items-center gap-2 border border-border bg-card text-sm font-medium px-3.5 py-2.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            title={isFree ? 'Export CSV — Plan Pro requis' : 'Exporter en CSV'}
+            title="Exporter en CSV"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">{exportingCsv ? 'Export…' : 'CSV'}</span>
@@ -569,51 +559,6 @@ export default function ApplicationsPage() {
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {showCsvUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-card rounded-2xl border border-border shadow-xl w-full max-w-sm p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-base">Fonctionnalité Pro</h2>
-              <button
-                onClick={() => setShowCsvUpgradeModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="bg-violet-50 border border-violet-100 rounded-xl p-4 mb-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-                  <Download className="w-4 h-4 text-violet-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-violet-900">Export CSV</p>
-                  <p className="text-xs text-violet-600">Plan Pro requis</p>
-                </div>
-              </div>
-              <p className="text-xs text-violet-700">
-                Exportez toutes vos candidatures au format CSV pour les analyser dans Excel, Google
-                Sheets ou tout autre outil.
-              </p>
-            </div>
-            <Link
-              href="/settings"
-              onClick={() => setShowCsvUpgradeModal(false)}
-              className="flex items-center justify-center gap-2 w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
-            >
-              Passer au Pro
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <button
-              onClick={() => setShowCsvUpgradeModal(false)}
-              className="mt-2 w-full text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
-            >
-              Pas maintenant
-            </button>
-          </div>
         </div>
       )}
 

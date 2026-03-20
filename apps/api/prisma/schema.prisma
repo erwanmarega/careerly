@@ -12,6 +12,26 @@ enum Plan {
   PRO
 }
 
+enum Role {
+  STUDENT
+  SCHOOL_ADMIN
+}
+
+model School {
+  id         String   @id @default(cuid())
+  name       String
+  inviteCode String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users User[]
+}
+
+enum DocumentType {
+  CV
+  COVER_LETTER
+}
+
 enum ApplicationStatus {
   SENT
   FOLLOW_UP
@@ -33,11 +53,28 @@ model User {
   resetPasswordToken   String?
   resetPasswordExpiry  DateTime?
   onboardingCompleted  Boolean  @default(false)
+  role                 Role     @default(STUDENT)
+  schoolId             String?
+  school               School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  schoolRemovedAt      DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
   applications Application[]
   reminders    Reminder[]
+  documents    Document[]
+}
+
+model Document {
+  id        String       @id @default(cuid())
+  name      String
+  type      DocumentType
+  filename  String
+  url       String
+  isActive  Boolean      @default(false)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
 }
 
 model Application {

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sparkles, Sun, X, Zap } from 'lucide-react'
+import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sun, School } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
 import { useUser } from '@/hooks/useUser'
@@ -13,15 +13,6 @@ import { clearTokens, storeUser, type AuthUser } from '@/lib/auth'
 const inputCls =
   'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card'
 
-const PLAN_LABELS: Record<string, string> = {
-  FREE: 'Gratuit',
-  PRO: 'Pro',
-}
-
-const PLAN_STYLES: Record<string, string> = {
-  FREE: 'bg-secondary text-muted-foreground',
-  PRO: 'bg-blue-100 text-blue-700',
-}
 
 function AvatarUpload({
   currentAvatar,
@@ -162,9 +153,6 @@ export default function SettingsPage() {
   const [profileSuccess, setProfileSuccess] = useState(false)
   const [profileError, setProfileError] = useState<string | null>(null)
 
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
-  const [portalLoading, setPortalLoading] = useState(false)
-
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -174,18 +162,6 @@ export default function SettingsPage() {
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
-
-  const [stripeSuccess, setStripeSuccess] = useState(false)
-  const [stripeCanceled, setStripeCanceled] = useState(false)
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const success = params.get('success') === 'true'
-    const canceled = params.get('canceled') === 'true'
-    setStripeSuccess(success)
-    setStripeCanceled(canceled)
-    if (success) refresh()
-  }, [])
 
   const initialized = useRef(false)
   useEffect(() => {
@@ -269,26 +245,6 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleCheckout(priceId: string) {
-    setCheckoutLoading(priceId)
-    try {
-      const { url } = await api.post<{ url: string }>('/stripe/create-checkout', { priceId })
-      if (url) window.location.href = url
-    } catch {
-      setCheckoutLoading(null)
-    }
-  }
-
-  async function handlePortal() {
-    setPortalLoading(true)
-    try {
-      const { url } = await api.post<{ url: string }>('/stripe/portal', {})
-      if (url) window.location.href = url
-    } catch {
-      setPortalLoading(false)
-    }
-  }
-
   async function handleDeleteAccount() {
     setDeleting(true)
     try {
@@ -301,8 +257,51 @@ export default function SettingsPage() {
     }
   }
 
-  const plan = user?.plan ?? 'FREE'
-  const isPaid = plan === 'PRO'
+  const [inviteCode, setInviteCode] = useState('')
+  const [joiningSchool, setJoiningSchool] = useState(false)
+  const [joinError, setJoinError] = useState<string | null>(null)
+  const [joinSuccess, setJoinSuccess] = useState(false)
+  const [leavingSchool, setLeavingSchool] = useState(false)
+  const [schoolName, setSchoolName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (user?.schoolId) {
+      api.get<{ name: string } | null>('/schools/current').then((s) => setSchoolName(s?.name ?? null)).catch(() => {})
+    }
+  }, [user?.schoolId])
+
+  async function handleJoinSchool(e: React.FormEvent) {
+    e.preventDefault()
+    if (inviteCode.length !== 8) {
+      setJoinError('Le code doit contenir 8 caractères')
+      return
+    }
+    setJoiningSchool(true)
+    setJoinError(null)
+    try {
+      const { school } = await api.post<{ school: { name: string } }>('/users/me/join-school', { inviteCode: inviteCode.toUpperCase() })
+      setSchoolName(school.name)
+      setJoinSuccess(true)
+      refresh()
+    } catch (err) {
+      setJoinError(err instanceof Error ? err.message : 'Code invalide')
+    } finally {
+      setJoiningSchool(false)
+    }
+  }
+
+  async function handleLeaveSchool() {
+    setLeavingSchool(true)
+    try {
+      await api.delete('/users/me/school')
+      setSchoolName(null)
+      setJoinSuccess(false)
+      refresh()
+    } catch {
+    } finally {
+      setLeavingSchool(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -325,22 +324,9 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Paramètres</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Gérez votre compte et votre abonnement
+          Gérez votre compte
         </p>
       </div>
-
-      {stripeSuccess && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-sm text-emerald-700">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-          <span>Abonnement activé avec succès ! Bienvenue dans le plan {PLAN_LABELS[plan]}.</span>
-        </div>
-      )}
-      {stripeCanceled && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-2xl text-sm text-muted-foreground">
-          <X className="w-4 h-4 flex-shrink-0" />
-          <span>Paiement annulé. Votre abonnement n&apos;a pas été modifié.</span>
-        </div>
-      )}
 
       <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
         <h2 className="font-semibold text-sm">Profil</h2>
@@ -459,84 +445,6 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      <div id="abonnement" className="bg-card rounded-2xl border border-border p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-sm">Abonnement</h2>
-          <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${PLAN_STYLES[plan] ?? PLAN_STYLES.FREE}`}
-          >
-            {PLAN_LABELS[plan] ?? plan}
-          </span>
-        </div>
-
-        {isPaid ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Vous êtes sur le plan <strong>{PLAN_LABELS[plan]}</strong>. Gérez votre abonnement,
-              vos factures et vos informations de paiement via le portail Stripe.
-            </p>
-            <button
-              onClick={handlePortal}
-              disabled={portalLoading}
-              className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {portalLoading ? 'Chargement…' : 'Gérer mon abonnement'}
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Passez à un plan payant pour accéder aux rappels, aux statistiques avancées et plus
-              encore.
-            </p>
-            <div className="max-w-sm">
-              <div className="border-2 border-primary rounded-2xl p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">Pro</p>
-                    <p className="text-xs text-muted-foreground">8€ / mois</p>
-                  </div>
-                </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    Candidatures illimitées
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    Rappels par email
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    Statistiques avancées
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    Export CSV &amp; PDF
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    Assistant IA (bientôt)
-                  </li>
-                </ul>
-                <button
-                  onClick={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!)}
-                  disabled={checkoutLoading !== null}
-                  className="w-full py-2 text-xs font-semibold bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {checkoutLoading === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID
-                    ? 'Chargement…'
-                    : 'Passer en Pro'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
       <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
         <h2 className="font-semibold text-sm">Apparence</h2>
         <div className="flex gap-3">
@@ -575,6 +483,69 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
+
+      {user?.role !== 'SCHOOL_ADMIN' && (
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <School className="w-4 h-4 text-muted-foreground" />
+            <h2 className="font-semibold text-sm">Mon école</h2>
+          </div>
+
+          {user?.schoolId && schoolName ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 px-4 py-3 bg-secondary rounded-xl">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-primary">{schoolName[0]?.toUpperCase()}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{schoolName}</p>
+                  <p className="text-xs text-muted-foreground">École associée à votre compte</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLeaveSchool}
+                disabled={leavingSchool}
+                className="text-sm font-medium text-muted-foreground border border-border px-4 py-2 rounded-xl hover:bg-secondary transition-colors disabled:opacity-50"
+              >
+                {leavingSchool ? 'En cours…' : 'Quitter cette école'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Rejoignez votre école en saisissant le code d&apos;invitation fourni par votre responsable de formation.
+              </p>
+              {joinError && (
+                <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                  {joinError}
+                </div>
+              )}
+              {joinSuccess && (
+                <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Vous avez rejoint {schoolName} !
+                </div>
+              )}
+              <form onSubmit={handleJoinSchool} className="flex gap-3">
+                <input
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase().slice(0, 8))}
+                  placeholder="CODE8CAR"
+                  maxLength={8}
+                  className="flex-1 font-mono tracking-widest border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card uppercase"
+                />
+                <button
+                  type="submit"
+                  disabled={joiningSchool || inviteCode.length !== 8}
+                  className="bg-primary text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-primary/90 transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {joiningSchool ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Rejoindre'}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="bg-card rounded-2xl border border-red-200 p-6 space-y-4">
         <h2 className="font-semibold text-sm text-red-600">Zone dangereuse</h2>

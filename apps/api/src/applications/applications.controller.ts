@@ -81,7 +81,6 @@ export class ApplicationsController {
       try {
         columnMapping = JSON.parse(mappingJson)
       } catch {
-        /**/
       }
     }
     return this.applicationsService.importFromCsv(user.id, csvText, columnMapping)

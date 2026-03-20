@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, Briefcase, CheckCircle2, Sparkles } from 'lucide-react'
+import { ArrowRight, Briefcase, CheckCircle2, Sparkles, School } from 'lucide-react'
 import { completeOnboarding } from '@/lib/auth'
+import { api } from '@/lib/api'
 import { createApplication } from '@/lib/applications'
 import { useUser } from '@/hooks/useUser'
 
-const STEPS = ['Bienvenue', 'Première candidature', 'Tout est prêt']
+const STEPS = ['Bienvenue', 'Mon école', 'Première candidature', 'Tout est prêt']
 
 function StepDots({ current }: { current: number }) {
   return (
@@ -29,12 +30,34 @@ export default function OnboardingPage() {
   const { user } = useUser()
   const [step, setStep] = useState(0)
 
+  const [inviteCode, setInviteCode] = useState('')
+  const [joiningSchool, setJoiningSchool] = useState(false)
+  const [joinError, setJoinError] = useState<string | null>(null)
+  const [joinedSchoolName, setJoinedSchoolName] = useState<string | null>(null)
+
   const [company, setCompany] = useState('')
   const [position, setPosition] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const firstName = user?.name?.split(' ')[0] ?? 'vous'
+
+  async function handleJoinSchool(e: React.FormEvent) {
+    e.preventDefault()
+    setJoiningSchool(true)
+    setJoinError(null)
+    try {
+      const { school } = await api.post<{ school: { name: string } }>('/users/me/join-school', {
+        inviteCode: inviteCode.toUpperCase(),
+      })
+      setJoinedSchoolName(school.name)
+      setTimeout(() => setStep(2), 1000)
+    } catch (err) {
+      setJoinError(err instanceof Error ? err.message : 'Code invalide')
+    } finally {
+      setJoiningSchool(false)
+    }
+  }
 
   async function handleAddApplication(e: React.FormEvent) {
     e.preventDefault()
@@ -43,16 +66,12 @@ export default function OnboardingPage() {
     setError(null)
     try {
       await createApplication({ company: company.trim(), position: position.trim() })
-      setStep(2)
+      setStep(3)
     } catch {
       setError('Une erreur est survenue. Réessayez.')
     } finally {
       setSaving(false)
     }
-  }
-
-  async function handleSkip() {
-    setStep(2)
   }
 
   async function handleFinish() {
@@ -79,7 +98,7 @@ export default function OnboardingPage() {
             <span className="text-primary">{firstName} !</span>
           </h1>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Postulo vous aide à garder le fil de votre recherche d'emploi.
+            Postulo vous aide à garder le fil de votre recherche d'alternance.
           </p>
           <ul className="space-y-3 mb-10">
             {[
@@ -104,6 +123,65 @@ export default function OnboardingPage() {
       )}
 
       {step === 1 && (
+        <div className="animate-in fade-in duration-300">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-8">
+            <School className="w-7 h-7 text-primary" />
+          </div>
+          <h2 className="text-3xl font-black tracking-tight leading-tight mb-2">
+            Votre école
+          </h2>
+          <p className="text-muted-foreground text-sm leading-relaxed mb-8">
+            Si votre école ou CFA utilise Postulo, entrez le code d'invitation qu'ils vous ont partagé.
+          </p>
+
+          {joinedSchoolName ? (
+            <div className="flex items-center gap-3 px-4 py-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-xl text-sm text-emerald-700 dark:text-emerald-400 mb-6">
+              <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold">École rejointe !</p>
+                <p className="text-emerald-600/80 dark:text-emerald-400/70">{joinedSchoolName}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {joinError && (
+                <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-sm text-red-600 dark:text-red-400">
+                  {joinError}
+                </div>
+              )}
+              <form onSubmit={handleJoinSchool} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Code d'invitation</label>
+                  <input
+                    type="text"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value.toUpperCase().slice(0, 8))}
+                    placeholder="ex : AB3F7C12"
+                    maxLength={8}
+                    className="w-full font-mono tracking-widest border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/50 uppercase"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={joiningSchool || inviteCode.length !== 8}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {joiningSchool ? 'Vérification…' : 'Rejoindre mon école'}
+                  {!joiningSchool && <ArrowRight className="w-4 h-4" />}
+                </button>
+              </form>
+              <button
+                onClick={() => setStep(2)}
+                className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors mt-4"
+              >
+                Je n'ai pas de code, passer cette étape
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {step === 2 && (
         <div className="animate-in fade-in duration-300">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-8">
             <Briefcase className="w-7 h-7 text-primary" />
@@ -155,7 +233,7 @@ export default function OnboardingPage() {
           </form>
 
           <button
-            onClick={handleSkip}
+            onClick={() => setStep(3)}
             className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors mt-4"
           >
             Passer cette étape
@@ -163,7 +241,7 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="animate-in fade-in duration-300 text-center">
           <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-8">
             <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
@@ -172,7 +250,7 @@ export default function OnboardingPage() {
             Tout est prêt !
           </h2>
           <p className="text-muted-foreground leading-relaxed mb-10 max-w-sm mx-auto">
-            Votre tableau de bord vous attend. Bonne recherche d'emploi !
+            Votre tableau de bord vous attend. Bonne recherche d'alternance !
           </p>
           <button
             onClick={handleFinish}

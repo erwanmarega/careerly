@@ -11,6 +11,9 @@ import {
   Trophy,
   TrendingUp,
   RefreshCw,
+  Target,
+  Pencil,
+  Check,
 } from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 import { useStats } from '@/hooks/useStats'
@@ -55,6 +58,24 @@ export default function DashboardPage() {
   const [remindersLoading, setRemindersLoading] = useState(true)
 
   const [thisWeek, setThisWeek] = useState(0)
+
+  const [weeklyGoal, setWeeklyGoal] = useState<number | null>(null)
+  const [editingGoal, setEditingGoal] = useState(false)
+  const [goalInput, setGoalInput] = useState('')
+
+  useEffect(() => {
+    const stored = localStorage.getItem('postulo_weekly_goal')
+    if (stored) setWeeklyGoal(Number(stored))
+  }, [])
+
+  function saveGoal() {
+    const val = parseInt(goalInput)
+    if (!isNaN(val) && val > 0) {
+      setWeeklyGoal(val)
+      localStorage.setItem('postulo_weekly_goal', String(val))
+    }
+    setEditingGoal(false)
+  }
 
   const firstName = user?.name?.split(' ')[0] ?? ''
 
@@ -253,6 +274,69 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-4">
+          <div className="bg-card rounded-2xl border border-border p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-3.5 h-3.5 text-primary" />
+                <h2 className="font-semibold text-sm">Objectif hebdo</h2>
+              </div>
+              {weeklyGoal !== null && !editingGoal && (
+                <button
+                  onClick={() => { setGoalInput(String(weeklyGoal)); setEditingGoal(true) }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {editingGoal ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && saveGoal()}
+                  autoFocus
+                  className="w-full border border-border rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="Ex : 5"
+                />
+                <button
+                  onClick={saveGoal}
+                  className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors flex-shrink-0"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : weeklyGoal === null ? (
+              <button
+                onClick={() => { setGoalInput(''); setEditingGoal(true) }}
+                className="w-full text-sm text-primary font-medium hover:underline underline-offset-4 text-left"
+              >
+                + Fixer un objectif
+              </button>
+            ) : (
+              <>
+                <div className="flex items-end justify-between mb-2">
+                  <span className="text-2xl font-bold">{thisWeek}</span>
+                  <span className="text-sm text-muted-foreground">/ {weeklyGoal} cette semaine</span>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      thisWeek >= weeklyGoal ? 'bg-emerald-500' : 'bg-primary'
+                    }`}
+                    style={{ width: `${Math.min((thisWeek / weeklyGoal) * 100, 100)}%` }}
+                  />
+                </div>
+                {thisWeek >= weeklyGoal && (
+                  <p className="text-xs text-emerald-600 font-medium mt-2">Objectif atteint 🎉</p>
+                )}
+              </>
+            )}
+          </div>
+
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -377,20 +461,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {user?.plan === 'FREE' && (
-            <div className="bg-primary rounded-2xl p-5 text-white">
-              <p className="text-sm font-semibold mb-1">Passez en Pro</p>
-              <p className="text-xs text-white/70 mb-4 leading-relaxed">
-                Candidatures illimitées, rappels, stats avancées et export PDF.
-              </p>
-              <Link
-                href="/settings#abonnement"
-                className="inline-flex items-center gap-1.5 bg-white text-primary text-xs font-semibold px-3 py-2 rounded-lg hover:bg-white/90 transition-colors"
-              >
-                Voir les offres <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>
