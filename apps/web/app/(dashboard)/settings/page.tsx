@@ -8,7 +8,7 @@ import { Camera, CheckCircle2, Loader2, Monitor, Moon, Sun, School } from 'lucid
 import { useTheme } from 'next-themes'
 import { api } from '@/lib/api'
 import { useUser } from '@/hooks/useUser'
-import { clearTokens, storeUser, type AuthUser } from '@/lib/auth'
+import { clearTokens, storeUser, getStoredUser, type AuthUser } from '@/lib/auth'
 
 const inputCls =
   'w-full border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-card'
@@ -64,14 +64,8 @@ function AvatarUpload({
         name: string | null
         plan: string
       }>('/users/me/avatar', formData)
-      storeUser({
-        id: updated.id,
-        email: updated.email,
-        name: updated.name,
-        plan: updated.plan,
-        avatar: updated.avatar ?? null,
-        onboardingCompleted: true,
-      })
+      const current = getStoredUser()
+      if (current) storeUser({ ...current, avatar: updated.avatar ?? null })
       onUploaded(updated.avatar ?? objectUrl)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'upload")
