@@ -7,6 +7,7 @@ export interface AuthUser {
   plan: string
   role: 'STUDENT' | 'SCHOOL_ADMIN'
   schoolId: string | null
+  schoolRemovedAt: string | null
   avatar: string | null
   onboardingCompleted?: boolean
 }
