@@ -5,4 +5,7 @@ export class CreateSchoolDto {
   @MinLength(2)
   @MaxLength(100)
   name: string
+
+  @IsString()
+  adminSecret: string
 }

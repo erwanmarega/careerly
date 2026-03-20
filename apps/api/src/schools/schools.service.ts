@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { randomBytes } from 'crypto'
 
@@ -24,6 +25,11 @@ export class SchoolsService {
   }
 
   async create(userId: string, dto: CreateSchoolDto) {
+    const secret = process.env.SCHOOL_CREATION_SECRET
+    if (!secret || dto.adminSecret !== secret) {
+      throw new UnauthorizedException('Code secret invalide')
+    }
+
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } })
 
     if (user.role === 'SCHOOL_ADMIN') {
