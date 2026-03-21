@@ -36,7 +36,7 @@ export class UsersService {
       }
     }
 
-    const apiUrl = `http://localhost:${process.env.PORT ?? 3001}`
+    const apiUrl = process.env.API_URL ?? `http://localhost:${process.env.PORT ?? 3001}`
     const avatarUrl = `${apiUrl}/uploads/avatars/${filename}`
 
     const user = await this.prisma.user.update({
