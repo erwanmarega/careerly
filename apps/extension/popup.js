@@ -1,4 +1,4 @@
-const API_URL = 'https://careerly-production.up.railway.app'
+const API_URL = 'https://api.postulo.fr'
 
 let accessToken = null
 let createdAppId = null

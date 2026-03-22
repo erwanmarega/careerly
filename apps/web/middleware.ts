@@ -16,7 +16,13 @@ export function middleware(request: NextRequest) {
   const isAdminPath = pathname.startsWith('/admin')
   const isStudentPath = STUDENT_ONLY_PREFIXES.some((p) => pathname.startsWith(p))
 
-  if (!token && !isPublic) {
+  if (!token && !isPublic && !pathname.startsWith('/api/')) {
+    const refreshToken = request.cookies.get('refresh_token')?.value
+    if (refreshToken) {
+      return NextResponse.redirect(
+        new URL(`/api/auth/silent-refresh?redirect=${encodeURIComponent(pathname)}`, request.url),
+      )
+    }
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

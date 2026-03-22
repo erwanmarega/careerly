@@ -11,19 +11,26 @@ interface ApiResponse<T> {
   data: T
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken()
+let refreshPromise: Promise<boolean> | null = null
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    cache: 'no-store',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  })
+async function tryRefresh(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise
+  refreshPromise = fetch('/api/auth/refresh', { method: 'POST' })
+    .then((r) => r.ok)
+    .catch(() => false)
+    .finally(() => {
+      refreshPromise = null
+    })
+  return refreshPromise
+}
 
+function clearClientAuth() {
+  document.cookie = 'access_token=; path=/; max-age=0'
+  document.cookie = 'user_role=; path=/; max-age=0'
+  localStorage.removeItem('postulo_user')
+}
+
+async function parseResponse<T>(res: Response): Promise<T> {
   const text = await res.text()
   const json = (text ? JSON.parse(text) : { success: true, data: undefined }) as
     | ApiResponse<T>
@@ -37,6 +44,42 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return (json as ApiResponse<T>).data
 }
 
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = getToken()
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  })
+
+  if (res.status === 401) {
+    const refreshed = await tryRefresh()
+    if (refreshed) {
+      const newToken = getToken()
+      const retry = await fetch(`${API_URL}${path}`, {
+        ...options,
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(newToken ? { Authorization: `Bearer ${newToken}` } : {}),
+          ...options.headers,
+        },
+      })
+      return parseResponse<T>(retry)
+    }
+    clearClientAuth()
+    window.location.href = '/login'
+    throw new Error('Session expirée')
+  }
+
+  return parseResponse<T>(res)
+}
+
 async function upload<T>(path: string, formData: FormData): Promise<T> {
   const token = getToken()
 
@@ -47,17 +90,24 @@ async function upload<T>(path: string, formData: FormData): Promise<T> {
     body: formData,
   })
 
-  const text = await res.text()
-  const json = (text ? JSON.parse(text) : { success: true, data: undefined }) as
-    | ApiResponse<T>
-    | { success: false; message: string }
-
-  if (!res.ok) {
-    const msg = (json as { message?: string }).message ?? 'Une erreur est survenue'
-    throw new Error(Array.isArray(msg) ? msg[0] : msg)
+  if (res.status === 401) {
+    const refreshed = await tryRefresh()
+    if (refreshed) {
+      const newToken = getToken()
+      const retry = await fetch(`${API_URL}${path}`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: newToken ? { Authorization: `Bearer ${newToken}` } : {},
+        body: formData,
+      })
+      return parseResponse<T>(retry)
+    }
+    clearClientAuth()
+    window.location.href = '/login'
+    throw new Error('Session expirée')
   }
 
-  return (json as ApiResponse<T>).data
+  return parseResponse<T>(res)
 }
 
 export const api = {
