@@ -21,9 +21,10 @@ export default function RegisterPage() {
     const name = form.get('name') as string
     const email = form.get('email') as string
     const password = form.get('password') as string
+    const cfToken = form.get('cf-turnstile-response') as string | null
 
     try {
-      await register(email, password, name)
+      await register(email, password, name, cfToken ?? undefined)
       router.push('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue')
@@ -140,6 +141,12 @@ export default function RegisterPage() {
             </button>
           </div>
         </div>
+
+        <div
+          className="cf-turnstile"
+          data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          data-theme="auto"
+        />
 
         <button
           type="submit"

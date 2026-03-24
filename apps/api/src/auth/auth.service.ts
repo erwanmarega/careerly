@@ -22,6 +22,8 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    await this.verifyTurnstile(dto.cfTurnstileToken)
+
     const exists = await this.prisma.user.findUnique({ where: { email: dto.email } })
     if (exists) throw new BadRequestException('Email already in use')
 
@@ -36,6 +38,8 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
+    await this.verifyTurnstile(dto.cfTurnstileToken)
+
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } })
     if (!user || !user.password) throw new UnauthorizedException('Invalid credentials')
 
@@ -139,6 +143,20 @@ export class AuthService {
       where: { id: user.id },
       data: { password: hashed, resetPasswordToken: null, resetPasswordExpiry: null },
     })
+  }
+
+  private async verifyTurnstile(token: string | undefined) {
+    const secret = this.config.get<string>('TURNSTILE_SECRET')
+    if (!secret) return
+    if (!token) throw new BadRequestException('Vérification anti-bot requise')
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, response: token }),
+    })
+    const data = (await res.json()) as { success: boolean }
+    if (!data.success) throw new BadRequestException('Vérification anti-bot échouée')
   }
 
   private async generateTokens(user: User) {

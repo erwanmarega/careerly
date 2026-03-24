@@ -20,9 +20,10 @@ export default function LoginPage() {
     const form = new FormData(e.currentTarget)
     const email = form.get('email') as string
     const password = form.get('password') as string
+    const cfToken = form.get('cf-turnstile-response') as string | null
 
     try {
-      await login(email, password)
+      await login(email, password, cfToken ?? undefined)
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue')
@@ -131,6 +132,12 @@ export default function LoginPage() {
             </button>
           </div>
         </div>
+
+        <div
+          className="cf-turnstile"
+          data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          data-theme="auto"
+        />
 
         <button
           type="submit"

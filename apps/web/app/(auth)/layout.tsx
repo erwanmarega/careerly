@@ -1,3 +1,4 @@
+import Script from 'next/script'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 
@@ -11,6 +12,7 @@ const features = [
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex">
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       <div className="flex-1 flex flex-col bg-background min-w-0">
         <header className="px-8 py-6 shrink-0">
           <Link href="/" className="font-bold text-xl tracking-tight">

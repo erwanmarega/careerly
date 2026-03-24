@@ -48,15 +48,15 @@ export function storeUser(user: AuthUser) {
   document.cookie = `user_role=${user.role ?? 'STUDENT'}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
 }
 
-export async function login(email: string, password: string) {
-  const data = await api.post<AuthResponse>('/auth/login', { email, password })
+export async function login(email: string, password: string, cfTurnstileToken?: string) {
+  const data = await api.post<AuthResponse>('/auth/login', { email, password, cfTurnstileToken })
   await setTokens(data.tokens.accessToken, data.tokens.refreshToken)
   storeUser(data.user)
   return data.user
 }
 
-export async function register(email: string, password: string, name: string) {
-  const data = await api.post<AuthResponse>('/auth/register', { email, password, name })
+export async function register(email: string, password: string, name: string, cfTurnstileToken?: string) {
+  const data = await api.post<AuthResponse>('/auth/register', { email, password, name, cfTurnstileToken })
   await setTokens(data.tokens.accessToken, data.tokens.refreshToken)
   storeUser(data.user)
   return data.user
