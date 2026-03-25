@@ -117,9 +117,9 @@ export default function AdminDashboardPage() {
         </div>
         {timelineLoading ? (
           <div className="flex items-end gap-2 h-28">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {[60, 40, 75, 30, 88, 50, 65, 45].map((h, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                <Skeleton className={`w-full rounded-md`} style={{ height: `${Math.random() * 60 + 20}px` }} />
+                <div className={`w-full rounded-md animate-pulse bg-secondary`} style={{ height: `${h}px` }} />
                 <Skeleton className="h-2.5 w-8" />
               </div>
             ))}
