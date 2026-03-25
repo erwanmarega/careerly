@@ -58,6 +58,13 @@ export class SchoolsController {
     return this.schoolsService.removeStudent(user.id, studentId)
   }
 
+  @Get('me/timeline')
+  @UseGuards(RoleGuard)
+  @Roles('SCHOOL_ADMIN')
+  getTimeline(@CurrentUser() user: User) {
+    return this.schoolsService.getTimeline(user.id)
+  }
+
   @Patch('me/invite-code')
   @UseGuards(RoleGuard)
   @Roles('SCHOOL_ADMIN')

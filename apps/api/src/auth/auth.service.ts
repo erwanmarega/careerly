@@ -25,7 +25,7 @@ export class AuthService {
     await this.verifyTurnstile(dto.cfTurnstileToken)
 
     const exists = await this.prisma.user.findUnique({ where: { email: dto.email } })
-    if (exists) throw new BadRequestException('Email already in use')
+    if (exists) throw new BadRequestException('Impossible de créer ce compte')
 
     const hashed = await bcrypt.hash(dto.password, 10)
     const user = await this.prisma.user.create({

@@ -174,6 +174,46 @@ export class SchoolsService {
     return { removed: true }
   }
 
+  async getTimeline(adminId: string) {
+    const admin = await this.prisma.user.findUniqueOrThrow({ where: { id: adminId } })
+    if (!admin.schoolId) throw new NotFoundException('Aucune école associée')
+
+    const now = new Date()
+    const day = now.getDay()
+    const diff = day === 0 ? -6 : 1 - day
+    const thisMonday = new Date(now)
+    thisMonday.setDate(now.getDate() + diff)
+    thisMonday.setHours(0, 0, 0, 0)
+
+    const startDate = new Date(thisMonday)
+    startDate.setDate(thisMonday.getDate() - 7 * 7)
+
+    const applications = await this.prisma.application.findMany({
+      where: {
+        appliedAt: { gte: startDate },
+        user: { schoolId: admin.schoolId, role: 'STUDENT' },
+      },
+      select: { appliedAt: true },
+    })
+
+    const weeks = []
+    for (let i = 7; i >= 0; i--) {
+      const weekStart = new Date(thisMonday)
+      weekStart.setDate(thisMonday.getDate() - i * 7)
+      const weekEnd = new Date(weekStart)
+      weekEnd.setDate(weekStart.getDate() + 7)
+
+      const count = applications.filter(
+        (a) => a.appliedAt >= weekStart && a.appliedAt < weekEnd,
+      ).length
+
+      const label = weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      weeks.push({ label, count })
+    }
+
+    return weeks
+  }
+
   async regenerateInviteCode(adminId: string) {
     const admin = await this.prisma.user.findUniqueOrThrow({ where: { id: adminId } })
     if (!admin.schoolId) throw new NotFoundException('Aucune école associée')

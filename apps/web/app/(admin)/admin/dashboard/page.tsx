@@ -2,15 +2,28 @@
 
 import Link from 'next/link'
 import { ArrowRight, Users, Trophy, Search, Briefcase } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useSchool, useStudents } from '@/hooks/useSchool'
+import { api } from '@/lib/api'
 
 function Skeleton({ className }: { className?: string }) {
   return <div className={`animate-pulse bg-secondary rounded-lg ${className}`} />
 }
 
+type TimelineWeek = { label: string; count: number }
+
 export default function AdminDashboardPage() {
   const { school, loading: schoolLoading } = useSchool()
   const { students, loading: studentsLoading } = useStudents()
+  const [timeline, setTimeline] = useState<TimelineWeek[]>([])
+  const [timelineLoading, setTimelineLoading] = useState(true)
+
+  useEffect(() => {
+    api.get<TimelineWeek[]>('/schools/me/timeline')
+      .then(setTimeline)
+      .catch(() => {})
+      .finally(() => setTimelineLoading(false))
+  }, [])
 
   const loading = schoolLoading || studentsLoading
 
@@ -96,6 +109,43 @@ export default function AdminDashboardPage() {
           </p>
         </div>
       )}
+
+      <div className="bg-card rounded-2xl border border-border p-6">
+        <div className="mb-5">
+          <h2 className="font-semibold text-sm">Activité de la promo</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Candidatures envoyées par semaine (8 dernières semaines)</p>
+        </div>
+        {timelineLoading ? (
+          <div className="flex items-end gap-2 h-28">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <Skeleton className={`w-full rounded-md`} style={{ height: `${Math.random() * 60 + 20}px` }} />
+                <Skeleton className="h-2.5 w-8" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          (() => {
+            const max = Math.max(...timeline.map((w) => w.count), 1)
+            return (
+              <div className="flex items-end gap-2 h-28">
+                {timeline.map((week, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1.5 group">
+                    <span className="text-xs font-semibold text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                      {week.count}
+                    </span>
+                    <div
+                      className="w-full rounded-md bg-primary/20 group-hover:bg-primary/40 transition-colors"
+                      style={{ height: `${Math.max((week.count / max) * 88, week.count > 0 ? 6 : 3)}px` }}
+                    />
+                    <span className="text-[10px] text-muted-foreground/60 truncate w-full text-center">{week.label}</span>
+                  </div>
+                ))}
+              </div>
+            )
+          })()
+        )}
+      </div>
 
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
