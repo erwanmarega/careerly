@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Upload, Trash2, FileCheck, Loader2, Star } from 'lucide-react'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { api } from '@/lib/api'
 
 interface Document {
@@ -201,14 +202,12 @@ export default function DocumentsPage() {
           ))}
         </div>
       ) : documents.length === 0 ? (
-        <div className="bg-card border border-border rounded-2xl px-6 py-16 text-center">
-          <p className="text-sm text-muted-foreground">Aucun document pour l&apos;instant.</p>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="mt-3 text-sm text-primary font-medium hover:underline underline-offset-4"
-          >
-            + Ajouter le premier
-          </button>
+        <div className="bg-card border border-border rounded-2xl">
+          <EmptyState
+            title="Aucun document pour l'instant."
+            description="Ajoute ton CV ou ta lettre de motivation pour les retrouver facilement."
+            action={{ label: '+ Ajouter le premier', onClick: () => fileInputRef.current?.click() }}
+          />
         </div>
       ) : (
         <div className="space-y-6">

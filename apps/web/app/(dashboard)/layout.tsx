@@ -131,7 +131,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-secondary/30 flex">
+    <div className="min-h-screen bg-secondary/30 flex relative">
+      <div className="fixed -top-60 -left-60 w-[700px] h-[700px] rounded-full bg-violet-600/10 blur-[160px] pointer-events-none z-0 dark:block hidden" />
+      <div className="fixed bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-indigo-500/8 blur-[140px] pointer-events-none z-0 dark:block hidden" />
 
       <aside className="w-56 bg-card border-r border-border flex flex-col fixed inset-y-0 left-0 z-30 hidden md:flex">
         <div className="px-5 py-6 border-b border-border">

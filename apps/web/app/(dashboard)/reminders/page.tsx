@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell, CalendarClock, Plus, Trash2, X } from 'lucide-react'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { api } from '@/lib/api'
 import { fetchApplications, type Application } from '@/lib/applications'
 
@@ -271,15 +272,12 @@ export default function RemindersPage() {
           ))}
         </div>
       ) : reminders.length === 0 ? (
-        <div className="bg-card rounded-2xl border border-border px-6 py-16 text-center">
-          <CalendarClock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Aucun rappel pour le moment.</p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline underline-offset-4"
-          >
-            <Plus className="w-3.5 h-3.5" /> Créer le premier
-          </button>
+        <div className="bg-card rounded-2xl border border-border">
+          <EmptyState
+            title="Aucun rappel pour le moment."
+            description="Crée un rappel pour ne jamais oublier de relancer une candidature."
+            action={{ label: '+ Créer le premier', onClick: () => setShowForm(true) }}
+          />
         </div>
       ) : (
         <div className="space-y-8">

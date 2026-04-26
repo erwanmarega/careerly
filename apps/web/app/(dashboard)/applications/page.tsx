@@ -24,6 +24,7 @@ import {
 } from '@/lib/applications'
 import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 import { api } from '@/lib/api'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 const SORT_OPTIONS = [
   { value: 'appliedAt:desc', label: 'Date (récent)' },
@@ -482,21 +483,11 @@ export default function ApplicationsPage() {
               ))}
             </div>
           ) : applications.length === 0 ? (
-            <div className="px-6 py-16 text-center">
-              <p className="text-sm text-muted-foreground">
-                {search || statusFilter
-                  ? 'Aucun résultat pour cette recherche.'
-                  : "Aucune candidature pour l'instant."}
-              </p>
-              {!search && !statusFilter && (
-                <Link
-                  href="/applications/new"
-                  className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline underline-offset-4"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Ajouter la première
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              title={search || statusFilter ? 'Aucun résultat pour cette recherche.' : "Aucune candidature pour l'instant."}
+              description={!search && !statusFilter ? "Commence par ajouter ta première candidature." : undefined}
+              action={!search && !statusFilter ? { label: '+ Ajouter la première', href: '/applications/new' } : undefined}
+            />
           ) : (
             <div className="divide-y divide-border">
               {applications.map((app) => (

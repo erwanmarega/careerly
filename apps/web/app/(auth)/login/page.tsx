@@ -35,8 +35,8 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-1">Connexion</h1>
-        <p className="text-muted-foreground text-sm">
+        <h1 className="text-3xl font-bold tracking-tight mb-1 text-white">Connexion</h1>
+        <p className="text-zinc-500 text-sm">
           Pas encore de compte ?{' '}
           <Link
             href="/register"
@@ -49,7 +49,7 @@ export default function LoginPage() {
 
       <a
         href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
-        className="w-full flex items-center justify-center gap-3 border border-border rounded-xl py-3 text-sm font-medium hover:bg-secondary transition-colors"
+        className="w-full flex items-center justify-center gap-3 border border-zinc-700 rounded-xl py-3 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors"
       >
         <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
           <path
@@ -86,7 +86,7 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-sm font-medium">
+          <label htmlFor="email" className="text-sm font-medium text-zinc-300">
             Email
           </label>
           <input
@@ -96,18 +96,18 @@ export default function LoginPage() {
             autoComplete="email"
             required
             placeholder="vous@exemple.com"
-            className="w-full border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/50 bg-card"
+            className="w-full border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-zinc-600 bg-zinc-800 text-white"
           />
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium">
+            <label htmlFor="password" className="text-sm font-medium text-zinc-300">
               Mot de passe
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               Mot de passe oublié ?
             </Link>
@@ -120,12 +120,12 @@ export default function LoginPage() {
               autoComplete="current-password"
               required
               placeholder="••••••••"
-              className="w-full border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/50 pr-11 bg-card"
+              className="w-full border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-zinc-600 pr-11 bg-zinc-800 text-white"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
               aria-label={showPassword ? 'Masquer' : 'Afficher'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

@@ -158,7 +158,7 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            {firstName ? `Bonjour, ${firstName} 👋` : 'Bonjour 👋'}
+            {firstName ? `Bonjour, ${firstName} !` : 'Bonjour !'}
           </h1>
           <div className="flex items-center gap-3 mt-1">
             <p className="text-muted-foreground text-sm">Voici où en est votre recherche.</p>
@@ -282,7 +282,10 @@ export default function DashboardPage() {
               </div>
               {weeklyGoal !== null && !editingGoal && (
                 <button
-                  onClick={() => { setGoalInput(String(weeklyGoal)); setEditingGoal(true) }}
+                  onClick={() => {
+                    setGoalInput(String(weeklyGoal))
+                    setEditingGoal(true)
+                  }}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
@@ -311,7 +314,10 @@ export default function DashboardPage() {
               </div>
             ) : weeklyGoal === null ? (
               <button
-                onClick={() => { setGoalInput(''); setEditingGoal(true) }}
+                onClick={() => {
+                  setGoalInput('')
+                  setEditingGoal(true)
+                }}
                 className="w-full text-sm text-primary font-medium hover:underline underline-offset-4 text-left"
               >
                 + Fixer un objectif
@@ -320,7 +326,9 @@ export default function DashboardPage() {
               <>
                 <div className="flex items-end justify-between mb-2">
                   <span className="text-2xl font-bold">{thisWeek}</span>
-                  <span className="text-sm text-muted-foreground">/ {weeklyGoal} cette semaine</span>
+                  <span className="text-sm text-muted-foreground">
+                    / {weeklyGoal} cette semaine
+                  </span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                   <div
@@ -460,7 +468,6 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>
