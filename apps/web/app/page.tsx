@@ -1,33 +1,9 @@
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
-
-const mockStudents = [
-  {
-    name: 'Camille Dupont',
-    apps: 12,
-    status: 'Alternance trouvée',
-    color: 'bg-emerald-500/20 text-emerald-400',
-  },
-  {
-    name: 'Lucas Martin',
-    apps: 8,
-    status: 'En recherche',
-    color: 'bg-amber-500/20 text-amber-400',
-  },
-  {
-    name: 'Inès Bouchard',
-    apps: 5,
-    status: 'En recherche',
-    color: 'bg-amber-500/20 text-amber-400',
-  },
-  { name: 'Tom Lefebvre', apps: 0, status: 'Pas démarré', color: 'bg-zinc-700/60 text-zinc-400' },
-  {
-    name: 'Sofia Moreau',
-    apps: 15,
-    status: 'Alternance trouvée',
-    color: 'bg-emerald-500/20 text-emerald-400',
-  },
-]
+import { MockDashboardCard } from '@/components/landing/MockDashboardCard'
+import { AnimateIn } from '@/components/landing/AnimateIn'
+import { LandingFeatures } from '@/components/landing/LandingFeatures'
+import { LandingPricing } from '@/components/landing/LandingPricing'
 
 export default function LandingPage() {
   return (
@@ -91,207 +67,90 @@ export default function LandingPage() {
                 width={250}
                 className="hidden lg:block absolute -top-[6.5rem] left-1/2 -translate-x-1/2 drop-shadow-2xl z-10 pointer-events-none"
               />
-              <div className="bg-zinc-900 rounded-t-2xl border border-zinc-800 border-b-0 overflow-hidden">
-                <div className="border-b border-zinc-800 px-5 py-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-sm text-white">BTS SIO — Promo 2024</p>
-                    <p className="text-xs text-zinc-500">24 étudiants · 8 alternances trouvées</p>
-                  </div>
-                  <div className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                    33% placés
-                  </div>
-                </div>
-                <div className="divide-y divide-zinc-800/60">
-                  {mockStudents.map((s) => (
-                    <div key={s.name} className="px-5 py-3.5 flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-black text-zinc-400">{s.name[0]}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-white truncate">{s.name}</p>
-                        <p className="text-xs text-zinc-600">
-                          {s.apps} candidature{s.apps !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${s.color}`}
-                      >
-                        {s.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-zinc-800 px-5 py-3 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-xs text-zinc-500">
-                    Tom Lefebvre — aucune candidature depuis 3 semaines
-                  </span>
-                </div>
-              </div>
+              <MockDashboardCard />
             </div>
           </div>
         </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-6 sm:px-10 py-20">
-        <p className="text-sm text-muted-foreground max-w-xl leading-relaxed mb-12">
-          En fin d'année, la plupart des responsables de formation découvrent trop tard que des
-          étudiants n'ont toujours rien. Postulo leur donne cette visibilité en continu, sans
-          chasser les étudiants par email.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px border border-border rounded-2xl overflow-hidden bg-border">
-          {[
-            {
-              label: "Qui n'a pas encore postulé",
-              desc: "Identifiez les étudiants inactifs avant qu'il soit trop tard.",
-            },
-            {
-              label: 'Où en est chaque étudiant',
-              desc: "Candidatures envoyées, entretiens en cours, offres reçues — tout d'un coup d'œil.",
-            },
-            {
-              label: 'Le taux de placement de votre promo',
-              desc: 'Un chiffre concret pour vos bilans, mis à jour en temps réel.',
-            },
-          ].map((item) => (
-            <div key={item.label} className="bg-card px-6 py-8">
-              <p className="font-semibold text-sm mb-2">{item.label}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
+        <AnimateIn>
+          <p className="text-sm text-muted-foreground max-w-xl leading-relaxed mb-12">
+            En fin d'année, la plupart des responsables de formation découvrent trop tard que des
+            étudiants n'ont toujours rien. Postulo leur donne cette visibilité en continu, sans
+            chasser les étudiants par email.
+          </p>
+        </AnimateIn>
+        <LandingFeatures />
       </section>
 
       <section className="border-t border-border">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20">
-          <p className="text-xs text-muted-foreground uppercase tracking-widest mb-10">
-            Comment ça marche
-          </p>
+          <AnimateIn>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest mb-10">
+              Comment ça marche
+            </p>
+          </AnimateIn>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-            <div className="space-y-8">
-              <div>
-                <p className="text-sm font-semibold text-primary mb-1">Pour l'école</p>
-                <p className="text-2xl font-bold tracking-tight mb-3">
-                  Vous créez votre espace, on vous donne un code.
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Partagez ce code à vos étudiants. Ceux qui s'inscrivent sur Postulo rejoignent
-                  automatiquement votre tableau de bord.
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-zinc-500 mb-1">Pour les étudiants</p>
-                <p className="text-2xl font-bold tracking-tight mb-3">
-                  Ils suivent leurs candidatures. Vous les voyez.
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Chaque candidature ajoutée par un étudiant apparaît dans votre dashboard. Pas de
-                  saisie manuelle, pas de formulaires à remplir.
-                </p>
-              </div>
-            </div>
-            <div className="bg-secondary/50 rounded-2xl border border-border p-6 space-y-3">
-              {[
-                { label: 'Relances automatiques aux étudiants inactifs', done: true },
-                { label: 'Historique des statuts de chaque candidature', done: true },
-                { label: 'Export CSV de toute la promotion', done: true },
-                { label: 'Données hébergées en Europe', done: true },
-                { label: 'Accès gratuit pour les étudiants', done: true },
-              ].map((f) => (
-                <div key={f.label} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-primary" />
-                  </div>
-                  <p className="text-sm">{f.label}</p>
+            <AnimateIn from="left">
+              <div className="space-y-8">
+                <div>
+                  <p className="text-sm font-semibold text-primary mb-1">Pour l'école</p>
+                  <p className="text-2xl font-bold tracking-tight mb-3">
+                    Vous créez votre espace, on vous donne un code.
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Partagez ce code à vos étudiants. Ceux qui s'inscrivent sur Postulo rejoignent
+                    automatiquement votre tableau de bord.
+                  </p>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-500 mb-1">Pour les étudiants</p>
+                  <p className="text-2xl font-bold tracking-tight mb-3">
+                    Ils suivent leurs candidatures. Vous les voyez.
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Chaque candidature ajoutée par un étudiant apparaît dans votre dashboard. Pas de
+                    saisie manuelle, pas de formulaires à remplir.
+                  </p>
+                </div>
+              </div>
+            </AnimateIn>
+            <AnimateIn from="right" delay={0.15}>
+              <div className="bg-secondary/50 rounded-2xl border border-border p-6 space-y-3">
+                {[
+                  { label: 'Relances automatiques aux étudiants inactifs' },
+                  { label: 'Historique des statuts de chaque candidature' },
+                  { label: 'Export CSV de toute la promotion' },
+                  { label: 'Données hébergées en Europe' },
+                  { label: 'Accès gratuit pour les étudiants' },
+                ].map((f) => (
+                  <div key={f.label} className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-primary" />
+                    </div>
+                    <p className="text-sm">{f.label}</p>
+                  </div>
+                ))}
+              </div>
+            </AnimateIn>
           </div>
         </div>
       </section>
 
       <section id="tarifs" className="bg-zinc-950 text-white border-t border-zinc-800">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 py-24">
-          <div className="max-w-xl mb-16">
-            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Tarifs</p>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Les étudiants utilisent Postulo{' '}
-              <span className="text-white font-semibold">gratuitement</span>. Seule l'école souscrit
-              un abonnement annuel par promotion suivie.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 flex flex-col">
-              <div className="mb-6">
-                <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Starter</p>
-                <p className="text-3xl font-black text-white mb-1">Sur devis</p>
-                <p className="text-sm text-zinc-500">1 promotion · jusqu'à 50 étudiants</p>
-              </div>
-              <ul className="space-y-3 mb-8 flex-1">
-                {[
-                  'Tableau de bord en temps réel',
-                  'Suivi des candidatures par étudiant',
-                  'Relances automatiques aux inactifs',
-                  'Export CSV de la promotion',
-                  'Accès gratuit pour les étudiants',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-400">
-                    <Check className="w-4 h-4 text-zinc-600 mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="mailto:contact@postulo.fr"
-                className="block text-center text-sm font-bold border border-zinc-700 text-white rounded-xl py-3 hover:bg-zinc-800 transition-colors"
-              >
-                Nous contacter
-              </a>
+          <AnimateIn>
+            <div className="max-w-xl mb-16">
+              <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Tarifs</p>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Les étudiants utilisent Postulo{' '}
+                <span className="text-white font-semibold">gratuitement</span>. Seule l'école souscrit
+                un abonnement annuel par promotion suivie.
+              </p>
             </div>
-
-            <div className="bg-zinc-900 border-2 border-primary rounded-2xl p-8 flex flex-col relative overflow-hidden">
-              <div className="absolute top-5 right-5 text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                Recommandé
-              </div>
-              <div className="mb-6">
-                <p className="text-xs text-primary uppercase tracking-widest mb-3">Pro</p>
-                <p className="text-3xl font-black text-white mb-1">Sur devis</p>
-                <p className="text-sm text-zinc-500">Promotions illimitées</p>
-              </div>
-              <ul className="space-y-3 mb-8 flex-1">
-                {[
-                  'Tout le plan Starter',
-                  'Promotions illimitées',
-                  'Multi-formations sur un seul compte',
-                  'Statistiques de placement avancées',
-                  "Accompagnement à l'onboarding",
-                  'Support prioritaire',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="mailto:contact@postulo.fr"
-                className="block text-center text-sm font-bold bg-primary text-white rounded-xl py-3 hover:bg-primary/90 transition-colors"
-              >
-                Demander une démo
-              </a>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-zinc-900 border border-zinc-800 max-w-lg">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Check className="w-4 h-4 text-primary" />
-            </div>
-            <p className="text-sm text-zinc-400">
-              <span className="text-white font-semibold">Gratuit pour tous les étudiants.</span>{' '}
-              Aucune carte bancaire, aucun abonnement.
-            </p>
-          </div>
+          </AnimateIn>
+          <LandingPricing />
         </div>
       </section>
 
