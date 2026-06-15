@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Bell, CalendarClock, Plus, Trash2, X } from 'lucide-react'
+import { Bell, Plus, Trash2, X } from 'lucide-react'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { api } from '@/lib/api'
 import { fetchApplications, type Application } from '@/lib/applications'
