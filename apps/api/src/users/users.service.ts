@@ -28,7 +28,8 @@ export class UsersService {
     if (existing?.avatar) {
       const match = existing.avatar.match(/\/uploads\/avatars\/(.+)$/)
       if (match) {
-        const oldPath = join(process.cwd(), 'public', 'uploads', 'avatars', match[1])
+        const uploadsRoot = process.env.UPLOADS_ROOT ?? join(process.cwd(), 'public')
+        const oldPath = join(uploadsRoot, 'uploads', 'avatars', match[1])
         try {
           unlinkSync(oldPath)
         } catch {

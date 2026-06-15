@@ -36,7 +36,7 @@ async function bootstrap() {
     }),
   )
 
-  app.useStaticAssets(join(process.cwd(), 'public'), {
+  app.useStaticAssets(process.env.UPLOADS_ROOT ?? join(process.cwd(), 'public'), {
     prefix: '/',
   })
 

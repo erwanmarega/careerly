@@ -15,6 +15,7 @@ import {
 
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { User } from '@prisma/client'
+import { mkdirSync } from 'fs'
 import { diskStorage } from 'multer'
 import { extname, join } from 'path'
 
@@ -25,8 +26,12 @@ import { UpdatePasswordDto } from './dto/update-password.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UsersService } from './users.service'
 
+const uploadsRoot = process.env.UPLOADS_ROOT ?? join(process.cwd(), 'public')
+const avatarsDir = join(uploadsRoot, 'uploads', 'avatars')
+mkdirSync(avatarsDir, { recursive: true })
+
 const avatarStorage = diskStorage({
-  destination: join(process.cwd(), 'public', 'uploads', 'avatars'),
+  destination: avatarsDir,
   filename: (_req, file, cb) => {
     const ext = extname(file.originalname).toLowerCase()
     cb(null, `${crypto.randomUUID()}${ext}`)
